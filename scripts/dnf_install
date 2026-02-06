@@ -4,7 +4,7 @@ FACE="$HOME/voidbloom13-dotfiles/assets/profile.jpg"
 WALLPAPER="$HOME/voidbloom13-dotfiles/assets/fedora-wallpaper.jpg"
 
 function gnome_install {
-    sudo dnf install -y \
+    sudo dnf install -y --skip-unavailable \
         gnome-tweaks \
         gnome-extensions-app
     flatpak install GdmSettings
@@ -15,19 +15,19 @@ function kde_install {
 }
 
 function gui_install {
-    sudo dnf install -y \
+    sudo dnf install -y --skip-unavailable \
         google-chrome-stable \
         kitty
 
     # Installs Nerd Fonts
     git clone --depth 1 https://github.com/ryanoasis/nerd-fonts ~/Downloads/nerd-fonts
-    ./$HOME/Downloads/nerd-fonts/install.sh
+    bash $HOME/Downloads/nerd-fonts/install.sh
     sudo fc-cache -fv
 }
 
 function initial_install {
     # Base Packages
-    sudo dnf install -y \
+    sudo dnf install -y --skip-unavailable \
         bat \
         dnf-plugins-core \
         fastfetch \
@@ -62,7 +62,7 @@ function initial_install {
         docker-engine-selinux \
         docker-engine
     sudo dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
-    sudo dnf install -y \
+    sudo dnf install -y --skip-unavailable \
         docker-ce \
         docker-ce-cli \
         containerd.io \
@@ -70,7 +70,7 @@ function initial_install {
         docker-compose-plugin
 
     # Languages
-    sudo dnf install -y \
+    sudo dnf install -y --skip-unavailable \
         dotnet-sdk-10.0 \
         java-latest-openjdk \
         maven \
@@ -78,9 +78,9 @@ function initial_install {
         postgresql-server \
         postgresql-contrib \
         python3.12 \
-        python3.12-pip \
+        python3.12-pip
 
-        # SDKMAN and Springboot CLI
+    # SDKMAN and Springboot CLI
     curl -s "https://get.sdkman.io" | bash
     source "$HOME/.sdkman/bin/sdkman-init.sh"
     sdk install springboot
@@ -118,66 +118,6 @@ function initial_install {
     sudo systemctl enable --now tailscaled
 }
 
-# function create_symlinks {
-#     local dotfiles_dir="$HOME/.dotfiles"
-#     local dotfiles_target="$HOME"
-#
-#     # 1. Top-level items in $dotfiles_dir
-#     find "$dotfiles_dir" -mindepth 1 -maxdepth 1 | while IFS= read -r item; do
-#         name=$(basename "$item")
-#         [[ "$name" == ".git" ]] && continue
-#
-#         if [[ -f "$item" ]]; then
-#             rel="${item#$dotfiles_dir/}"
-#             dest="$dotfiles_target/$rel"
-#             if [[ -e "$dest" && ! -L "$dest" ]]; then
-#                 echo "Backing up $dest -> ${dest}.bak"
-#                 mv "$dest" "${dest}.bak"
-#             fi
-#         fi
-#
-#         if [[ -d "$item" ]]; then
-#             # 2. One level deeper for subdirs (e.g. .config/nvim)
-#             find "$item" -mindepth 1 -maxdepth 1 | while IFS= read -r sub; do
-#                 rel="${sub#$dotfiles_dir/}"
-#                 dest="$dotfiles_target/$rel"
-#                 if [[ -e "$dest" && ! -L "$dest" ]]; then
-#                     echo "Backing up $dest -> ${dest}.bak"
-#                     mv "$dest" "${dest}.bak"
-#                 fi
-#             done
-#         fi
-#     done
-#     echo "Running stow..."
-#     stow -v -t "$dotfiles_target" -d "$dotfiles_dir" .
-# }
-#
-# function dotfiles_setup {
-#     local dotfiles_repo="https://github.com/voidbloom13/arch-dotfiles"
-#     local dotfiles_dir="$HOME/.dotfiles"
-#     local temp_dir="$HOME/repo_dotfiles"
-#
-#     echo -e "\e[1;44;87m             Import dotfiles?             \e[0m"
-#     read -p "Would you like to sync dotfiles? [Y/n] " dotfiles_setup
-#     dotfiles_setup=${dotfiles_setup:-Y}
-#     case $dotfiles_setup in
-#         [yY] )
-#             echo "Importing dotfiles now..."
-#             mkdir -p $dotfiles_dir
-#             git clone $dotfiles_repo $temp_dir
-#             rsync -av --backup --backup-dir="$dotfiles_dir/.backups" --suffix=".bak" $temp_dir/.dotfiles/ $dotfiles_dir
-#             rm -rf $temp_dir
-#             echo "Import complete."
-#             create_symlinks
-#             ;;
-#         [nN] )
-#             echo "Skipping dotfiles import."
-#             ;;
-#         * )
-#             echo "Skipping dotfiles import."
-#             ;;
-#     esac
-# }
 
 function git_setup {
     echo -e "\e[1;44;87m             Git and Github Setup             \e[0m"

@@ -20,40 +20,87 @@ fi
 
 echo "Checking for conflicts for package '$PACKAGE'..."
 
-find "$SRC_PACKAGE_DIR" -mindepth 1 -maxdepth 1 | while read -r src_path; do
-    rel_path_from_package_root=$(basename "$src_path")
+# Determine package type and corresponding stow/target directories
+STOW_COMMAND_OPTIONS=()
+STOW_COMMAND_PACKAGE_ARG="$PACKAGE"
 
-    if [ "$rel_path_from_package_root" = ".config" ] && [ -d "$src_path" ]; then
-        find "$src_path" -mindepth 1 -maxdepth 1 | while read -r nested_src_path; do
-            config_item_name=$(basename "$nested_src_path")
-            target_path="$HOME/.config/$config_item_name"
+# This will be the directory whose *contents* stow will try to link
+ACTUAL_STOW_SOURCE_CONTENTS_DIR="$SRC_PACKAGE_DIR"
 
-            if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
-                echo "Conflict found for: .config/$config_item_name"
-                mv "$target_path" "$BACKUP_DIR/$config_item_name.bak"
-                echo " -> Moved existing file to $BACKUP_DIR/$config_item_name.bak"
-            elif [ -L "$target_path" ]; then
-                echo "Removing existing symlink at: $target_path"
-                echo "$(date): $target_path -> $(readlink "$target_path")" >> "$HOME/.symlink_log"
-                rm "$target_path"
-                echo " -> Symlink removed. Logged to $HOME/.symlink_log"
-            fi
-        done
-    else
-        target_path="$HOME/$rel_path_from_package_root"
-        if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
-            echo "Conflict found for: $rel_path_from_package_root"
-            mv "$target_path" "$BACKUP_DIR/$rel_path_from_package_root.bak"
-            echo " -> Moved existing file to $BACKUP_DIR/$rel_path_from_package_root.bak"
-        elif [ -L "$target_path" ]; then
-            echo "Removing existing symlink at: $target_path"
-            echo "$(date): $target_path -> $(readlink "$target_path")" >> "$HOME/.symlink_log"
-            rm "$target_path"
-            echo " -> Symlink removed. Logged to $HOME/.symlink_log"
-        fi
+# This will be the final root directory where the links will appear
+FINAL_TARGET_ROOT_DIR="$HOME"
+
+if [ -d "$SRC_PACKAGE_DIR/.config/$PACKAGE" ]; then
+    # Type 2: e.g., nvim -> .dotfiles/nvim/.config/nvim/
+    # Stow from DOTFILES_DIR to HOME, package is nvim.
+    # This will result in ~/.config/nvim/
+    echo "  -> Detected Type 2: .config/$PACKAGE structure (e.g., nvim)."
+    # Default options for stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE" are fine.
+elif [ -d "$SRC_PACKAGE_DIR/.config" ]; then
+    # Type 3: e.g., hypr -> .dotfiles/hypr/.config/hyprland.conf
+    # Stow contents of .dotfiles/hypr/.config to ~/.config/hypr/
+    echo "  -> Detected Type 3: .config/ direct contents structure (e.g., hypr)."
+    STOW_COMMAND_OPTIONS+=("-d" "$SRC_PACKAGE_DIR/.config")
+    STOW_COMMAND_PACKAGE_ARG="." # Stow everything in STOW_BASE_DIR
+    FINAL_TARGET_ROOT_DIR="$HOME/.config/$PACKAGE"
+    mkdir -p "$FINAL_TARGET_ROOT_DIR"
+else
+    # Type 1: e.g., bash -> .dotfiles/bash/.bashrc
+    # Stow from DOTFILES_DIR to HOME, package is bash.
+    # This will result in ~/.bashrc
+    echo "  -> Detected Type 1: Direct home link structure (e.g., bash)."
+    # Default options for stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE" are fine.
+fi
+
+# Helper function to process conflicts
+process_conflict() {
+    local target_path="$1"
+    local relative_path="$2" # For display purposes
+
+    if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
+        echo "Conflict found for: $relative_path"
+        mv "$target_path" "$BACKUP_DIR/$(basename "$target_path").bak"
+        echo " -> Moved existing file to $BACKUP_DIR/$(basename "$target_path").bak"
+    elif [ -L "$target_path" ]; then
+        echo "Removing existing symlink at: $target_path"
+        echo "$(date): $target_path -> $(readlink "$target_path")" >> "$HOME/.symlink_log"
+        rm "$target_path"
+        echo " -> Symlink removed. Logged to $HOME/.symlink_log"
     fi
+}
+
+# The find command will list items that stow would attempt to link
+find "$ACTUAL_STOW_SOURCE_CONTENTS_DIR" -mindepth 1 -maxdepth 1 | while read -r src_item_path; do
+    item_name=$(basename "$src_item_path")
+    
+    # Construct the full target path where stow would try to place this item
+    conflict_target_path="$FINAL_TARGET_ROOT_DIR/$item_name"
+    
+    # Construct a relative path for display in messages
+    display_relative_path=""
+    if [ "$FINAL_TARGET_ROOT_DIR" = "$HOME" ]; then
+        display_relative_path="$item_name"
+    elif [[ "$FINAL_TARGET_ROOT_DIR" == "$HOME/.config/"* ]]; then
+        # This handles cases like ~/.config/hypr/hyprland.conf or ~/.config/nvim/init.lua
+        # It takes the part after $HOME/ and appends the item_name
+        # The sed command is to clean up cases where PACKAGE might already be part of the path (e.g. for nvim after the .config)
+        # However, for Type 3, FINAL_TARGET_ROOT_DIR will already be $HOME/.config/$PACKAGE, so it's simpler.
+        display_relative_path=".config/${FINAL_TARGET_ROOT_DIR#$HOME/.config/}/$item_name"
+        display_relative_path=$(echo "$display_relative_path" | sed 's/\/\.\//\//g')
+    else
+        display_relative_path="${FINAL_TARGET_ROOT_DIR#$HOME/}/$item_name"
+    fi
+
+    process_conflict "$conflict_target_path" "$display_relative_path"
 done
 
+
 echo "Stowing package '$PACKAGE'..."
-stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE"
+if [ ${#STOW_COMMAND_OPTIONS[@]} -eq 0 ]; then
+    # Default stow command for Type 1 and Type 2 packages
+    stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE"
+else
+    # Custom stow command for Type 3 packages
+    stow "${STOW_COMMAND_OPTIONS[@]}" -t "$FINAL_TARGET_ROOT_DIR" "$STOW_COMMAND_PACKAGE_ARG"
+fi
 echo "Done."

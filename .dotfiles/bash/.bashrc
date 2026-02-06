@@ -1,14 +1,5 @@
-# Adds the contents of any existing .bash_alias files to $HOME/dotfiles/.bash_aliases
-if [ -f $HOME/.bash_aliases ] && [ ! -L $HOME/.bash_aliases ]; then
-    echo "$HOME/dotfiles/.dotfiles/.bash_aliases" >> "$HOME/dotfiles/.dotfiles/.bash_aliases.tmp"
-    cat "$HOME/.bash_aliases" "$HOME/.bash_aliases.tmp" | sort | uniq | grep -v '^$' >> $HOME/dotfiles/.dotfiles/.bash_aliases
-    rm $HOME/.bash_aliases.tmp
-fi
-
-if [ -e $HOME/.bash_aliases ]; then
-	source $HOME/dotfiles/.dotfiles/.bash_aliases
-fi
-source $HOME/dotfiles/.dotfiles/.profile
+# Sources .profile
+. ~/.profile
 
 # General settings
 export EDITOR=vim
@@ -23,10 +14,14 @@ export PATH=$PATH:$HOME/.local/bin
 if [[ -z "$(command -v oh-my-posh)" ]]; then
     curl -s https://ohmyposh.dev/install.sh | bash -s
 fi
-eval "$(oh-my-posh init bash --config "$HOME/.dotfiles/void_catppuccin.omp.toml")"
+eval "$(oh-my-posh init bash --config "$HOME/voidbloom13-dotfiles/assets/void_catppuccin.omp.toml")"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
