@@ -1,0 +1,155 @@
+* {
+  border: none;
+  border-radius: 0;
+  background: none;
+  min-height: 0;
+  padding: 0px;
+  font-family: "Montserrat";
+  font-weight: 500;
+}
+
+window#waybar {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: rgba(255, 255, 255, 1);
+}
+
+/* HYPRLAND WORKSPACES */
+#workspaces {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+}
+
+#workspaces button {
+  transition: all 0.15s;
+  background-color: rgba(255, 255, 255, 0.5);
+  font-size: 0px;
+  border-radius: 8px;
+  min-width: 0;
+  padding: 4px;
+  margin: 2px;
+}
+
+#workspaces button.active {
+  background-color: rgba(255, 255, 255, 1);
+  padding: 4px 12px;
+}
+
+/* CPU, Disk, and Memory */
+#cpu {
+  transition: all 0.3s;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+#cpu.zero {
+  color: rgba(0, 128, 255, 1);
+}
+
+#cpu.low {
+  color: rgba(128, 0, 255, 1);
+}
+
+#cpu.medium {
+  color: rgba(255, 0, 255, 1);
+}
+
+#cpu.high {
+  color: rgba(255, 0, 128, 1);
+}
+
+#disk {
+  margin-left: 4px;
+  margin-right: 4px;
+  color: rgba(0, 128, 255, 1);
+}
+
+#memory {
+  transition: all 0.3s;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+#memory.zero {
+  color: rgba(0, 128, 255, 1);
+}
+
+#memory.low {
+  color: rgba(128, 0, 255, 1);
+}
+
+#memory.medium {
+  color: rgba(255, 0, 255, 1);
+}
+
+#memory.high {
+  color: rgba(255, 0, 128, 1);
+}
+
+/* BLUETOOTH AND NETWORK */
+#bluetooth {
+  margin-left: 4px;
+  margin-right: 4px;
+  color: rgba(0, 128, 255, 1);
+}
+
+#network {
+  margin-left: 4px;
+  margin-right: 4px;
+  color: rgba(0, 128, 255, 1);
+}
+
+/* WIREPLUMBER */
+#wireplumber {
+  transition: all 0.3s;
+  margin-left: 4px;
+  margin-right: 4px;
+  color: rgba(0, 128, 255, 1);
+}
+
+#wireplumber.muted {
+  color: rgba(72, 72, 72, 1);
+}
+
+/* BATTERY */
+@keyframes critical {
+  0% {
+    color: rgba(255, 0, 0, 1);
+  }
+  100% {
+    color: rgba(0, 0, 0, 1);
+  }
+}
+
+#battery {
+  transition: all 0.3s;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+#battery.full {
+  color: rgba(0, 255, 0, 1);
+}
+
+#battery.high {
+  color: rgba(255, 255, 0, 1);
+}
+
+#battery.warning {
+  color: rgba(255, 128, 0, 1);
+}
+
+#battery.low {
+  color: rgba(255, 0, 0, 1);
+}
+
+#battery.critical {
+  animation: 2s critical steps(2, start) infinite;
+}
+
+/* POWER */
+#custom-power {
+  margin-left: 4px;
+  margin-right: 4px;
+  color: rgba(255, 0, 0, 1);
+}

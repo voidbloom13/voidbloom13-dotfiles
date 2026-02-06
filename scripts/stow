@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+DOTFILES_DIR="$HOME/.dotfiles"
+BACKUP_DIR="$HOME/.config/.backups"
+PACKAGE=$1
+
+find "$DOTFILES_DIR/$PACKAGE" -maxdepth 3 -not -path '*/.*' | while read -r src; do
+    rel_path=${src#$DOTFILES_DIR/$PACKAGE/}
+    [ -z "$rel_path" ] && continue
+
+    target="$HOME/$rel_path"
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+        echo "Conflict: $rel_path"
+        mkdir -p "$(dirname "$BACKUP_DIR/$rel_path")"
+        mv "$target" "$BACKUP_DIR/$rel_path.bak"
+        echo "Moved $target to $BACKUP_DIR/$rel_path.bak"
+    fi
+done
+
+stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE"

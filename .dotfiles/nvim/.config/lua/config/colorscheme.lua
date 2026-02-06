@@ -1,0 +1,8 @@
+vim.api.nvim_set_hl(0, "NeoTreeNormal", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#008fff" })
+vim.api.nvim_set_hl(0, "LineNr", { italic = true, fg = "#8f49ff" })
+vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#008fff" })
+vim.api.nvim_set_hl(0, "Comment", { italic = true, fg = "#a0c0cf" })
+vim.api.nvim_set_hl(0, "String", { italic = true, bold = true })
+vim.api.nvim_set_hl(0, "Visual", { bg = "#008fff", fg = "#ffffff" })

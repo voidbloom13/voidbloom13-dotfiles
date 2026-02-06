@@ -1,0 +1,108 @@
+{
+  "layer": "top",
+  "position": "top",
+  "spacing": 3,
+  "height": 15,
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-center": ["clock"],
+  "modules-right": ["cpu", "disk", "memory", "bluetooth", "network", "wireplumber", "battery", "custom/power"],
+  "hyprland/workspaces": {
+    "persistent-workspaces": {
+      "*": 3,
+    },
+  },
+  "clock": {
+    "format": "{:%I:%M %p}",
+    "format-alt": "{:%a, %b %d, %Y (%R)}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode"          : "year",
+      "mode-mon-col"  : 3,
+      "weeks-pos"     : "right",
+      "on-scroll"     : 1,
+      "format": {
+        "months":     "<span color='#ffead3'><b>{}</b></span>",
+        "days":       "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
+        "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
+        "today":      "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
+    },
+    "actions":  {
+      "on-click-right": "mode",
+      "on-scroll-up": "tz_up",
+      "on-scroll-down": "tz_down",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
+  },
+  "cpu": {
+    "interval": 1,
+    "format": "   {usage}%, {avg_frequency}GHz",
+    "states": {
+      "zero": 0,
+      "low": 20,
+      "medium": 50,
+      "high": 75
+    }
+  },
+  "disk": {
+    "interval": 30,
+    "format": "  {free}",
+    "tooltip": true,
+    "tooltip-format": "Used: {used}\nFree: {free}\nTotal: {total}"
+  },
+  "memory": {
+    "interval": 1,
+    "format": "   {used}GiB",
+    "tooltip": true,
+    "tooltip-format": "Used: {used}GiB\nAvailable: {avail}GiB\nTotal: {total}GiB",
+    "states": {
+      "zero": 0,
+      "low": 20,
+      "medium": 50,
+      "high": 75
+    }
+  },
+  "bluetooth": {
+    "on-click": "blueman-manager",
+    "format-on": "󰂯",
+    "format-disabled": "<span foreground='#ff0000'>󰂲</span>",
+    "format-connected": "<span foreground='#00ff00'>󰂯</span>   {device_alias}",
+    "max-length": 12
+  },
+  "network": {
+    "on-click": "nm-connection-editor",
+    "format": "<span foreground='#00ff00'>󰖩 </span>",
+    "format-wifi": "<span foreground='#00ff00'>󰖩  </span>{essid}",
+    "format-ethernet": "<span foreground='#00ff00'>  </span> {ipaddr}",
+    "format-disconnected": "<span foreground='#ff0000'>󱚼 </span>",
+    "max-length": 12
+  },
+  "wireplumber": {
+    "format": "{icon} {volume}%",
+    "format-muted": " ",
+    "format-icons": [" ", " ", " "]
+  },
+  "battery": {
+    "design-capacity": true,
+    "interval": 60,
+    "states": {
+      "full": 100,
+      "high": 70,
+      "warning": 50,
+      "low": 30,
+      "critical": 15
+    },
+    "format": "{icon} {capacity}%",
+    "format-charging": "󰂄 {capacity}%",
+    "format-plugged": "󰂄 {capacity}%",
+    "format-icons": ["󰁻", "󰁽", "󰁿", "󰂁", "󰁹"]
+  },
+  "custom/power": {
+    "format": "⏻ ",
+    "on-click": "$HOME/dotfiles/.dotfiles/.config/waybar/shutdown.sh",
+    "tooltip": true,
+    "tooltip-format": "Turn off device."
+  }
+}
