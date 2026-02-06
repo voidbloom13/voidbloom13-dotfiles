@@ -1,20 +1,59 @@
 #!/usr/bin/env bash
 
-DOTFILES_DIR="$HOME/.dotfiles"
+DOTFILES_DIR="$HOME/voidbloom13-dotfiles/.dotfiles"
 BACKUP_DIR="$HOME/.config/.backups"
 PACKAGE=$1
 
-find "$DOTFILES_DIR/$PACKAGE" -maxdepth 3 -not -path '*/.*' | while read -r src; do
-    rel_path=${src#$DOTFILES_DIR/$PACKAGE/}
-    [ -z "$rel_path" ] && continue
+if [ -z "$PACKAGE" ]; then
+    echo "Usage: $0 <package>"
+    exit 1
+fi
 
-    target="$HOME/$rel_path"
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
-        echo "Conflict: $rel_path"
-        mkdir -p "$(dirname "$BACKUP_DIR/$rel_path")"
-        mv "$target" "$BACKUP_DIR/$rel_path.bak"
-        echo "Moved $target to $BACKUP_DIR/$rel_path.bak"
+mkdir -p "$BACKUP_DIR"
+
+SRC_PACKAGE_DIR="$DOTFILES_DIR/$PACKAGE"
+
+if [ ! -d "$SRC_PACKAGE_DIR" ]; then
+    echo "Error: Package '$PACKAGE' not found in $DOTFILES_DIR"
+    exit 1
+fi
+
+echo "Checking for conflicts for package '$PACKAGE'..."
+
+find "$SRC_PACKAGE_DIR" -mindepth 1 -maxdepth 1 | while read -r src_path; do
+    rel_path_from_package_root=$(basename "$src_path")
+
+    if [ "$rel_path_from_package_root" = ".config" ] && [ -d "$src_path" ]; then
+        find "$src_path" -mindepth 1 -maxdepth 1 | while read -r nested_src_path; do
+            config_item_name=$(basename "$nested_src_path")
+            target_path="$HOME/.config/$config_item_name"
+
+            if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
+                echo "Conflict found for: .config/$config_item_name"
+                mv "$target_path" "$BACKUP_DIR/$config_item_name.bak"
+                echo " -> Moved existing file to $BACKUP_DIR/$config_item_name.bak"
+            elif [ -L "$target_path" ]; then
+                echo "Removing existing symlink at: $target_path"
+                echo "$(date): $target_path -> $(readlink "$target_path")" >> "$HOME/.symlink_log"
+                rm "$target_path"
+                echo " -> Symlink removed. Logged to $HOME/.symlink_log"
+            fi
+        done
+    else
+        target_path="$HOME/$rel_path_from_package_root"
+        if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
+            echo "Conflict found for: $rel_path_from_package_root"
+            mv "$target_path" "$BACKUP_DIR/$rel_path_from_package_root.bak"
+            echo " -> Moved existing file to $BACKUP_DIR/$rel_path_from_package_root.bak"
+        elif [ -L "$target_path" ]; then
+            echo "Removing existing symlink at: $target_path"
+            echo "$(date): $target_path -> $(readlink "$target_path")" >> "$HOME/.symlink_log"
+            rm "$target_path"
+            echo " -> Symlink removed. Logged to $HOME/.symlink_log"
+        fi
     fi
 done
 
+echo "Stowing package '$PACKAGE'..."
 stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE"
+echo "Done."
