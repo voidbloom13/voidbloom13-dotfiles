@@ -10,7 +10,9 @@ function gnome_install {
     flatpak install GdmSettings
 }
 
-function kde_install {}
+function kde_install {
+    echo "Running from KDE Plasma"
+}
 
 function gui_install {
     sudo dnf install -y \
@@ -204,7 +206,7 @@ function main {
     # dotfiles_setup
 
     for package in "$HOME/voidbloom13-dotfiles/.dotfiles"; do
-        ./$HOME/voidbloom13-dotfiles/scripts/stow $package
+        bash $HOME/voidbloom13-dotfiles/scripts/stow $package
     done
 
     ln -s voidbloom13-dotfiles/.prettierrc.json $HOME/.prettierrc.json
