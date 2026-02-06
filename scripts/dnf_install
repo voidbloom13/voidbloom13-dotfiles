@@ -26,6 +26,10 @@ function gui_install {
 }
 
 function initial_install {
+    # Enable RPM Fusion
+    sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+    sudo dnf install -y https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
     # Base Packages
     sudo dnf install -y --skip-unavailable \
         bat \
@@ -178,8 +182,7 @@ function main {
     echo -e "\e[1;37mNext Steps\e[0m:"
     echo -e "* Run \e[1;33m[sudo tailscale up]\e[0m and follow the link to set up \e[1;33mTailscale VPN\e[0m"
     echo -e "* Run \e[1;35m[chsh]\e[0m and change user shell to \e[1;35m/usr/bin/zsh\e[0m"
-    echo -e "* Run \e[1;32m[tmux]\e[0m and press \e[1;32m[<ctrl>+b, I]\e[0m to install tmux plugins"
-    echo -e "* Run \e[1;34m:MasonInstallAll\e[0m inside \e[1;34mNeovim\e[0m"
+    echo -e "* Run \e[1;32m[tmux]\e[0m and press \e[1;32m[<ctrl>+b, i]\e[0m to install tmux plugins"
 }
 
 main
