@@ -59,66 +59,6 @@ function hypr_setup {
     echo -e "[backend]\nbackend=wpa_supplicant" | sudo tee /etc/NetworkManager/NetworkManager.conf
 }
 
-function create_symlinks {
-    local dotfiles_dir="$HOME/.dotfiles"
-    local dotfiles_target="$HOME"
-
-    # 1. Top-level items in $dotfiles_dir
-    find "$dotfiles_dir" -mindepth 1 -maxdepth 1 | while IFS= read -r item; do
-        name=$(basename "$item")
-        [[ "$name" == ".git" ]] && continue
-
-        if [[ -f "$item" ]]; then
-            rel="${item#$dotfiles_dir/}"
-            dest="$dotfiles_target/$rel"
-            if [[ -e "$dest" && ! -L "$dest" ]]; then
-                echo "Backing up $dest -> ${dest}.bak_$(date +%F_%H:%M:%S)"
-                mv "$dest" "${dest}.bak_$(date +%F_%H:%M:%S)"
-            fi
-        fi
-
-        if [[ -d "$item" ]]; then
-            # 2. One level deeper for subdirs (e.g. .config/nvim)
-            find "$item" -mindepth 1 -maxdepth 1 | while IFS= read -r sub; do
-                rel="${sub#$dotfiles_dir/}"
-                dest="$dotfiles_target/$rel"
-                if [[ -e "$dest" && ! -L "$dest" ]]; then
-                    echo "Backing up $dest -> ${dest}.bak_$(date +%F_%H:%M:%S)"
-                    mv "$dest" "${dest}.bak_$(date +%F_%H:%M:%S)"
-                fi
-            done
-        fi
-    done
-    echo "Running stow..."
-    stow -v -t "$dotfiles_target" -d "$dotfiles_dir" .
-}
-
-function dotfiles_setup {
-    local dotfiles_repo="https://github.com/voidbloom13/arch-dotfiles"
-    local dotfiles_dir="$HOME/.dotfiles"
-    local temp_dir="$HOME/repo_dotfiles"
-
-    echo -e "\e[1;44;87m             Import dotfiles?             \e[0m"
-    read -p "Would you like to sync dotfiles? [Y/n] " dotfiles_setup
-    dotfiles_setup=${dotfiles_setup:-Y}
-    case $dotfiles_setup in
-        [yY] )
-            echo "Importing dotfiles now..."
-            mkdir -p $dotfiles_dir
-            git clone $dotfiles_repo $temp_dir
-            rsync -av --backup --backup-dir="$dotfiles_dir/.backups" --suffix=".bak" $temp_dir/.dotfiles/ $dotfiles_dir
-            rm -rf $temp_dir
-            echo "Import complete."
-            create_symlinks
-            ;; 
-        [nN] )
-            echo "Skipping dotfiles import."
-            ;; 
-        * )
-            echo "Skipping dotfiles import."
-            ;; 
-    esac
-}
 
 function git_setup {
     # Git Config and GH Authorization
@@ -145,14 +85,11 @@ function main {
     # Installs base packages
     cd $HOME
     sudo pacman -Syu \
-        aspnet-runtime \
         base-devel \
         bat \
         cifs-utils \
         curl \
         docker \
-        dotnet-runtime \
-        dotnet-sdk \
         fastfetch \
         flatpak \
         fzf \
@@ -160,14 +97,8 @@ function main {
         ghostty \
         git \
         github-cli \
-        jdk-openjdk \
         man \
-        maven \
         nvim \
-        nodejs \
-        npm \
-        pgcli \
-        postgresql \
         ripgrep \
         rsync \
         stow \
@@ -181,11 +112,26 @@ function main {
         zoxide \
         zsh
 
+    # Languages
+    sudo pacman -Syu \
+        aspnet-runtime \
+        dotnet-runtime \
+        dotnet-sdk \
+        jdk-openjdk \
+        maven \
+        nodejs \
+        npm \
+        pgcli \
+        postgresql \
+
     # Clones and Installs yay
     git clone https://aur.archlinux.org/yay
     cd yay
     makepkg -si
     cd $HOME
+
+    # Claude Code
+    curl -fsSL https://claude.ai/install.sh | bash
 
     # Installs SDKMan and Spring CLI
     curl -s "https://get.sdkman.io" | bash
@@ -235,6 +181,9 @@ function main {
     git_setup
     clear && fastfetch
 
+    sudo systemctl enable --now tailscaled
+    sudo systemctl enable --now docker
+    sudo usermod -aG docker $USER
     echo -e "\e[1;37mNext Steps\e[0m:"
     echo -e "* Run \e[1;33m[sudo tailscale up]\e[0m and follow the link to set up \e[1;33mTailscale VPN\e[0m"
     echo -e "* Run \e[1;35m[chsh]\e[0m and change user shell to \e[1;35m/usr/bin/zsh\e[0m"

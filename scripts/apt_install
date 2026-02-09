@@ -1,29 +1,26 @@
 #!/usr/bin/env bash
 
 FACE="$HOME/voidbloom13-dotfiles/assets/profile.jpg"
-WALLPAPER="$HOME/voidbloom13-dotfiles/assets/fedora-wallpaper.jpg"
+WALLPAPER="$HOME/voidbloom13-dotfiles/assets/ubuntu-wallpaper.jpg"
 TERM_WALLPAPER="$HOME/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
 
 function main {
-    # System Update
-    sudo dnf update -y
+    # System Update + Nala
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install -y nala
 
     # Base Packages
-    sudo dnf install -y --skip-unavailable \
+    sudo nala install -y \
         bat \
-        dnf-plugins-core \
+        curl \
         fastfetch \
         flatpak \
         fzf \
-        gcc \
         git \
-        gh \
-        man-pages \
-        neovim \
+        man-db \
         ripgrep \
         rsync \
         stow \
-        tailscale \
         tmux \
         tree \
         unzip \
@@ -31,20 +28,36 @@ function main {
         zoxide \
         zsh
 
+    # Neovim PPA (0.11+ for LazyVim)
+    sudo add-apt-repository -y ppa:neovim-ppa/unstable
+    sudo nala update
+    sudo nala install -y neovim
+
+    # GitHub CLI
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+    sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo nala update
+    sudo nala install -y gh
+
+    # Tailscale
+    curl -fsSL https://tailscale.com/install.sh | sh
+
     # Docker
-    sudo dnf remove -y \
-        docker \
-        docker-client \
-        docker-client-latest \
-        docker-common \
-        docker-latest \
-        docker-latest-logrotate \
-        docker-logrotate \
-        docker-selinux \
-        docker-engine-selinux \
-        docker-engine
-    sudo dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
-    sudo dnf install -y --skip-unavailable \
+    sudo apt remove -y \
+        docker.io \
+        docker-doc \
+        docker-compose \
+        docker-compose-v2 \
+        podman-docker \
+        containerd \
+        runc
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo nala update
+    sudo nala install -y \
         docker-ce \
         docker-ce-cli \
         containerd.io \
@@ -52,20 +65,21 @@ function main {
         docker-compose-plugin
 
     # Languages
-    sudo dnf install -y --skip-unavailable \
+    # Microsoft .NET repo
+    sudo nala install -y software-properties-common
+    curl -fsSL https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb -o /tmp/packages-microsoft-prod.deb
+    sudo dpkg -i /tmp/packages-microsoft-prod.deb
+    rm /tmp/packages-microsoft-prod.deb
+    sudo nala update
+    sudo nala install -y \
+        build-essential \
+        default-jdk \
         dotnet-sdk-10.0 \
-        java-latest-openjdk \
         maven \
-        nodejs \
-        postgresql-server \
+        postgresql \
         postgresql-contrib \
-        python3.12 \
-        python3.12-pip
-
-    # RPM Fusion
-    sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-    sudo dnf install -y https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-    sudo dnf install -y fedora-workstation-repositories
+        python3 \
+        python3-pip
 
     # Claude Code
     curl -fsSL https://claude.ai/install.sh | bash
@@ -99,7 +113,7 @@ function main {
         @tailwindcss/language-server
 
     # PostgreSQL Init
-    sudo postgresql-setup --initdb --unit postgresql
+    sudo pg_ctlcluster $(pg_lsclusters -h | head -1 | awk '{print $1}') main start
 
     # Dotfiles Sync
     find "$HOME/voidbloom13-dotfiles/.dotfiles/" -mindepth 1 -maxdepth 1 -type d | while read -r package; do
@@ -109,9 +123,11 @@ function main {
 
     # GUI Apps
     if ! uname -a | grep -q WSL && (pgrep -l "Xorg" || pgrep -l "wayland"); then
-        sudo dnf config-manager --enable google-chrome
-        sudo dnf copr enable scottames/ghostty
-        sudo dnf install -y --skip-unavailable \
+        # Google Chrome
+        curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+        sudo nala update
+        sudo nala install -y \
             ghostty \
             google-chrome-stable \
             kitty
@@ -125,9 +141,9 @@ function main {
     case "$XDG_CURRENT_DESKTOP" in
         *GNOME*)
             echo "Setting up Gnome Desktop..."
-            sudo dnf install -y --skip-unavailable \
+            sudo nala install -y \
                 gnome-tweaks \
-                gnome-extensions-app
+                gnome-shell-extensions
             flatpak install GdmSettings
             gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER"
             gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER"

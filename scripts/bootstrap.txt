@@ -10,6 +10,8 @@ Languages and Runtimes
   - Typescript
   - NodeJS
   - NPM
+    - @angular/cli
+    - @angular/language-server
     - @google/gemini-cli
     - nodemon
     - prettier-plugin-tailwindcss

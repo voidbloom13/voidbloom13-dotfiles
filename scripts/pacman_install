@@ -1,24 +1,23 @@
 #!/usr/bin/env bash
 
 FACE="$HOME/voidbloom13-dotfiles/assets/profile.jpg"
-WALLPAPER="$HOME/voidbloom13-dotfiles/assets/fedora-wallpaper.jpg"
+WALLPAPER="$HOME/voidbloom13-dotfiles/assets/arch-wallpaper.jpg"
 TERM_WALLPAPER="$HOME/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
 
 function main {
-    # System Update
-    sudo dnf update -y
-
-    # Base Packages
-    sudo dnf install -y --skip-unavailable \
+    # System Update + Base Packages
+    sudo pacman -Syu \
+        base-devel \
         bat \
-        dnf-plugins-core \
+        cifs-utils \
+        curl \
         fastfetch \
         flatpak \
         fzf \
         gcc \
         git \
-        gh \
-        man-pages \
+        github-cli \
+        man-db \
         neovim \
         ripgrep \
         rsync \
@@ -32,40 +31,28 @@ function main {
         zsh
 
     # Docker
-    sudo dnf remove -y \
-        docker \
-        docker-client \
-        docker-client-latest \
-        docker-common \
-        docker-latest \
-        docker-latest-logrotate \
-        docker-logrotate \
-        docker-selinux \
-        docker-engine-selinux \
-        docker-engine
-    sudo dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
-    sudo dnf install -y --skip-unavailable \
-        docker-ce \
-        docker-ce-cli \
-        containerd.io \
-        docker-buildx-plugin \
-        docker-compose-plugin
+    sudo pacman -Syu \
+        docker
 
     # Languages
-    sudo dnf install -y --skip-unavailable \
-        dotnet-sdk-10.0 \
-        java-latest-openjdk \
+    sudo pacman -Syu \
+        aspnet-runtime \
+        dotnet-runtime \
+        dotnet-sdk \
+        jdk-openjdk \
         maven \
         nodejs \
-        postgresql-server \
-        postgresql-contrib \
-        python3.12 \
-        python3.12-pip
+        npm \
+        pgcli \
+        postgresql \
+        python \
+        python-pip
 
-    # RPM Fusion
-    sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-    sudo dnf install -y https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-    sudo dnf install -y fedora-workstation-repositories
+    # Yay AUR Helper
+    git clone https://aur.archlinux.org/yay
+    cd yay
+    makepkg -si
+    cd $HOME
 
     # Claude Code
     curl -fsSL https://claude.ai/install.sh | bash
@@ -79,7 +66,7 @@ function main {
 
     # SDKMAN and Spring CLI
     curl -s "https://get.sdkman.io" | bash
-    source "$HOME/.sdkman/bin/sdkman-init.sh"
+    source $HOME/.sdkman/bin/sdkman-init.sh
     sdk install springboot
 
     # TMUX Theme and TPM
@@ -99,7 +86,7 @@ function main {
         @tailwindcss/language-server
 
     # PostgreSQL Init
-    sudo postgresql-setup --initdb --unit postgresql
+    sudo -u postgres initdb -D /var/lib/postgres/data
 
     # Dotfiles Sync
     find "$HOME/voidbloom13-dotfiles/.dotfiles/" -mindepth 1 -maxdepth 1 -type d | while read -r package; do
@@ -109,12 +96,13 @@ function main {
 
     # GUI Apps
     if ! uname -a | grep -q WSL && (pgrep -l "Xorg" || pgrep -l "wayland"); then
-        sudo dnf config-manager --enable google-chrome
-        sudo dnf copr enable scottames/ghostty
-        sudo dnf install -y --skip-unavailable \
+        sudo pacman -Syu \
             ghostty \
-            google-chrome-stable \
-            kitty
+            kitty \
+            ttf-font-awesome \
+            $(pacman -Sgq nerd-fonts)
+
+        yay -S google-chrome
 
         chmod 644 $FACE
         ln -s $FACE ~/.face
@@ -125,10 +113,12 @@ function main {
     case "$XDG_CURRENT_DESKTOP" in
         *GNOME*)
             echo "Setting up Gnome Desktop..."
-            sudo dnf install -y --skip-unavailable \
+            sudo pacman -Syu \
+                gnome \
                 gnome-tweaks \
-                gnome-extensions-app
-            flatpak install GdmSettings
+                extension-manager
+            yay -S \
+                gdm-settings
             gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER"
             gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER"
             ;;
