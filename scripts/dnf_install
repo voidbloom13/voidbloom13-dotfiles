@@ -15,7 +15,10 @@ function kde_install {
 }
 
 function gui_install {
+    sudo dnf config-manager --enable google-chrome
+    sudo dnf copr enable scottames/ghostty
     sudo dnf install -y --skip-unavailable \
+        ghostty \
         google-chrome-stable \
         kitty
 
@@ -29,6 +32,9 @@ function initial_install {
     # Enable RPM Fusion
     sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
     sudo dnf install -y https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+    # Enabled default workstation repos
+    sudo dnf install -y fedora-workstation-repositories
 
     # Base Packages
     sudo dnf install -y --skip-unavailable \
