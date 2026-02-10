@@ -51,13 +51,13 @@ function main {
     sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
-    sudo tee /etc/apt/sources.list.d/docker.sources <<-EOF
-    Types: deb
-    URIs: https://download.docker.com/linux/ubuntu
-    Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-    Components: stable
-    Signed-By: /etc/apt/keyrings/docker.asc
-    EOF
+    sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
     sudo nala update
     sudo nala install -y \
         docker-ce \
@@ -175,13 +175,13 @@ function main {
             sudo mkdir -p /usr/share/sddm/themes/silent
             sudo cp -rf . /usr/share/sddm/themes/silent
             sudo cp -r /usr/share/sddm/themes/silent/fonts/* /usr/share/fonts/
-            sudo cat << EOF > /etc/sddm.conf.d/theme.conf
-            [General]
-            GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
+            sudo tee /etc/sddm.conf.d/theme.conf > /dev/null <<EOF
+[General]
+GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
 
-            [Theme]
-            Current=silent
-            EOF
+[Theme]
+Current=silent
+EOF
 
             cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
