@@ -116,13 +116,16 @@ function main {
             google-chrome-stable \
             kitty
 
+        git clone --depth=1 https://github.com/ryanoasis/nerd-fonts $HOME/Downloads/nerd-fonts
+        cd $HOME/Downloads/nerd-fonts/
+        ./install.sh
 
         ln -s $TERM_WALLPAPER ~/.config/kitty/wallpaper.jpg
         git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
         sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
 
-        git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-theme
-        sudo $HOME/Downloads/circle-theme/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons-dracula"
+        git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-icons
+        sudo $HOME/Downloads/circle-icons/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons"
     fi
 
     # DE-Specific Setup

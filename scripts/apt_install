@@ -134,12 +134,16 @@ function main {
             google-chrome-stable \
             kitty
 
+        git clone --depth=1 https://github.com/ryanoasis/nerd-fonts $HOME/Downloads/nerd-fonts
+        cd $HOME/Downloads/nerd-fonts/
+        ./install.sh
+
         ln -s $TERM_WALLPAPER ~/.config/kitty/wallpaper.jpg
         git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
         sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
 
-        git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-theme
-        sudo $HOME/Downloads/circle-theme/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons-dracula"
+        git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-icons
+        sudo $HOME/Downloads/circle-icons/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons"
     fi
 
     # DE-Specific Setup
@@ -165,7 +169,21 @@ function main {
                 libqt6svg6 \
                 qml6-module-qtvirtualkeyboard \
                 qml6-module-qtmultimedia
-            git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM && cd SilentSDDM && ./install.sh
+            git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM
+            cd SilentSDDM
+            ./test.sh
+            sudo mkdir -p /usr/share/sddm/themes/silent
+            sudo cp -rf . /usr/share/sddm/themes/silent
+            sudo cp -r /usr/share/sddm/themes/silent/fonts/* /usr/share/fonts/
+            # sudo cat << EOF > /etc/sddm.conf.d/theme.conf
+            # [General]
+            # InputMethod=qtvirtualkeyboard
+            # GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
+            #
+            # [Theme]
+            # Current=silent
+            # EOF
+
             cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
             plasma-apply-wallpaperimage "$WALLPAPER"
