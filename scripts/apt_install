@@ -2,6 +2,7 @@
 
 FACE="$HOME/voidbloom13-dotfiles/assets/profile.jpg"
 WALLPAPER="$HOME/voidbloom13-dotfiles/assets/ubuntu-wallpaper.jpg"
+LOGIN_WALLPAPER="$HOME/voidbloom13-dotfiles/assets/ubuntu-gdm-wallpaper.jpg"
 TERM_WALLPAPER="$HOME/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
 
 function main {
@@ -13,11 +14,11 @@ function main {
     sudo nala install -y \
         bat \
         curl \
-        fastfetch \
         flatpak \
         fzf \
         git \
         man-db \
+        neofetch \
         ripgrep \
         rsync \
         stow \
@@ -78,6 +79,8 @@ function main {
         maven \
         postgresql \
         postgresql-contrib \
+        nodejs \
+        npm \
         python3 \
         python3-pip
 
@@ -128,13 +131,15 @@ function main {
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
         sudo nala update
         sudo nala install -y \
-            ghostty \
             google-chrome-stable \
             kitty
 
-        chmod 644 $FACE
-        ln -s $FACE ~/.face
         ln -s $TERM_WALLPAPER ~/.config/kitty/wallpaper.jpg
+        git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
+        sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
+
+        git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-theme
+        sudo $HOME/Downloads/circle-theme/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons-dracula"
     fi
 
     # DE-Specific Setup
@@ -145,12 +150,27 @@ function main {
                 gnome-tweaks \
                 gnome-shell-extensions
             flatpak install GdmSettings
+
+            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face
+            sudo busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$(id -u) org.freedesktop.Accounts.User SetIconFile s "$HOME/.face"
             gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER"
             gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER"
+            gsettings set org.gnome.desktop.interface cursor-theme "miku-cursor-linux"
+            gsettings set org.gnome.desktop.interface icon-theme "circle-icons-dracula-dark"
             ;;
         *KDE*)
             echo "Setting up KDE Plasma Desktop..."
+            sudo nala install -y \
+                sddm \
+                libqt6svg6 \
+                qml6-module-qtvirtualkeyboard \
+                qml6-module-qtmultimedia
+            git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM && cd SilentSDDM && ./install.sh
+            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
+            sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
             plasma-apply-wallpaperimage "$WALLPAPER"
+            plasma-apply-cursortheme "miku-cursor-linux"
+            plasma-change-icons "circle-icons-dracula-dark"
             ;;
         *)
             echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
@@ -184,7 +204,7 @@ function main {
 
     # Post-Install
     . ~/.profile && . ~/.bashrc
-    clear && fastfetch
+    clear && neofetch
     echo -e "\e[1;37mNext Steps\e[0m:"
     echo -e "* Run \e[1;33m[sudo tailscale up]\e[0m and follow the link to set up \e[1;33mTailscale VPN\e[0m"
     echo -e "* Run \e[1;35m[chsh]\e[0m and change user shell to \e[1;35m/usr/bin/zsh\e[0m"

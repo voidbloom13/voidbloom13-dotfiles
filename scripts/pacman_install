@@ -104,9 +104,12 @@ function main {
 
         yay -S google-chrome
 
-        chmod 644 $FACE
-        ln -s $FACE ~/.face
         ln -s $TERM_WALLPAPER ~/.config/kitty/wallpaper.jpg
+        git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
+        sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
+
+        git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-theme
+        sudo $HOME/Downloads/circle-theme/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons-dracula"
     fi
 
     # DE-Specific Setup
@@ -119,12 +122,27 @@ function main {
                 extension-manager
             yay -S \
                 gdm-settings
+
+            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face
+            sudo busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$(id -u) org.freedesktop.Accounts.User SetIconFile s "$HOME/.face"
             gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER"
             gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER"
+            gsettings set org.gnome.desktop.interface cursor-theme "miku-cursor-linux"
+            gsettings set org.gnome.desktop.interface icon-theme "circle-icons-dracula-dark"
             ;;
         *KDE*)
             echo "Setting up KDE Plasma Desktop..."
+            sudo pacman -S --needed \
+                sddm \
+                qt6-svg \
+                qt6-virtualkeyboard \
+                qt6-multimedia-ffmpeg
+            git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM && cd SilentSDDM && ./install.sh
+            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
+            sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
             plasma-apply-wallpaperimage "$WALLPAPER"
+            plasma-apply-cursortheme "miku-cursor-linux"
+            plasma-change-icons "circle-icons-dracula-dark"
             ;;
         *)
             echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
