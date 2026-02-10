@@ -45,18 +45,19 @@ function main {
     curl -fsSL https://tailscale.com/install.sh | sh
 
     # Docker
-    sudo apt remove -y \
-        docker.io \
-        docker-doc \
-        docker-compose \
-        docker-compose-v2 \
-        podman-docker \
-        containerd \
-        runc
+    sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
+    sudo apt update
+    sudo nala install -y ca-certificates curl
     sudo install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo tee /etc/apt/sources.list.d/docker.sources <<-EOF
+    Types: deb
+    URIs: https://download.docker.com/linux/ubuntu
+    Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+    Components: stable
+    Signed-By: /etc/apt/keyrings/docker.asc
+    EOF
     sudo nala update
     sudo nala install -y \
         docker-ce \
@@ -171,18 +172,16 @@ function main {
                 qml6-module-qtmultimedia
             git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM
             cd SilentSDDM
-            ./test.sh
             sudo mkdir -p /usr/share/sddm/themes/silent
             sudo cp -rf . /usr/share/sddm/themes/silent
             sudo cp -r /usr/share/sddm/themes/silent/fonts/* /usr/share/fonts/
-            # sudo cat << EOF > /etc/sddm.conf.d/theme.conf
-            # [General]
-            # InputMethod=qtvirtualkeyboard
-            # GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
-            #
-            # [Theme]
-            # Current=silent
-            # EOF
+            sudo cat << EOF > /etc/sddm.conf.d/theme.conf
+            [General]
+            GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
+
+            [Theme]
+            Current=silent
+            EOF
 
             cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
