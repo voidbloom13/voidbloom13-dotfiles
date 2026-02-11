@@ -168,7 +168,9 @@ EOF
             sudo nala install -y \
                 sddm \
                 libqt6svg6 \
-                qml6-module-qtvirtualkeyboard \
+                libqt6virtualkeyboard6 \
+                libqt6multimedia6 \
+                qml6-module-qtquick-virtualkeyboard \
                 qml6-module-qtmultimedia
             git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM
             cd SilentSDDM
