@@ -175,24 +175,25 @@ EOF
                 libqt6multimedia6 \
                 qml6-module-qtquick-virtualkeyboard \
                 qml6-module-qtmultimedia
-            git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM
-            cd SilentSDDM
-            sudo mkdir -p /usr/share/sddm/themes/silent
-            sudo cp -rf . /usr/share/sddm/themes/silent
-            sudo cp -r /usr/share/sddm/themes/silent/fonts/* /usr/share/fonts/
-            sudo tee /etc/sddm.conf.d/theme.conf > /dev/null <<EOF
-[General]
-GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
-
-[Theme]
-Current=silent
-EOF
+            #             git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM
+            #             cd SilentSDDM
+            #             sudo mkdir -p /usr/share/sddm/themes/silent
+            #             sudo cp -rf . /usr/share/sddm/themes/silent
+            #             sudo cp -r /usr/share/sddm/themes/silent/fonts/* /usr/share/fonts/
+            #             sudo tee /etc/sddm.conf.d/theme.conf > /dev/null <<EOF
+            # [General]
+            # GreeterEnvironment=QML2_IMPORT_PATH=/usr/share/sddm/themes/silent/components/,QT_IM_MODULE=qtvirtualkeyboard
+            #
+            # [Theme]
+            # Current=silent
+            # EOF
 
             cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
             plasma-apply-wallpaperimage "$WALLPAPER"
             plasma-apply-cursortheme "miku-cursor-linux"
             plasma-change-icons "circle-icons-dracula-dark"
+            echo -e "\e[1;97mUncomment Theme section from voidbloom13-dotfiles/scripts/apt_install if using KDE Plasma 6+ (Kubuntu 25.10)"
             ;;
         *)
             echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
