@@ -5,6 +5,8 @@ WALLPAPER="$HOME/voidbloom13-dotfiles/assets/arch-wallpaper.jpg"
 TERM_WALLPAPER="$HOME/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
 
 function main {
+    cd $HOME
+
     # System Update + Base Packages
     sudo pacman -Syu \
         base-devel \
