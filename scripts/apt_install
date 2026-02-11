@@ -83,7 +83,8 @@ EOF
         nodejs \
         npm \
         python3 \
-        python3-pip
+        python3-pip \
+        python3-venv
 
     # Claude Code
     curl -fsSL https://claude.ai/install.sh | bash
@@ -167,6 +168,7 @@ EOF
             echo "Setting up KDE Plasma Desktop..."
             sudo nala install -y \
                 sddm \
+                sddm-kcm \
                 libqt6svg6 \
                 libqt6virtualkeyboard6 \
                 libqt6multimedia6 \
