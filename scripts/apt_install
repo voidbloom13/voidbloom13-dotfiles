@@ -192,7 +192,7 @@ EOF
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
             plasma-apply-wallpaperimage "$WALLPAPER"
             plasma-apply-cursortheme "miku-cursor-linux"
-            plasma-change-icons "circle-icons-dracula-dark"
+            $(locate plasma-changeicons) "circle-icons-dracula-dark"
             echo -e "\e[1;97mUncomment Theme section from voidbloom13-dotfiles/scripts/apt_install if using KDE Plasma 6+ (Kubuntu 25.10)"
             ;;
         *)

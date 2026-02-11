@@ -145,7 +145,7 @@ function main {
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
             plasma-apply-wallpaperimage "$WALLPAPER"
             plasma-apply-cursortheme "miku-cursor-linux"
-            plasma-change-icons "circle-icons-dracula-dark"
+            $(locate plasma-changeicons) "circle-icons-dracula-dark"
             ;;
         *)
             echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
