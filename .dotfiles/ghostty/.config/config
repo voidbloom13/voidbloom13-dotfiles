@@ -1,5 +1,5 @@
-background = 000000
-background-opacity = 0.7
+background-image = "~/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
+background-image-fit = "cover"
 maximize = true
 cursor-style = block
 cursor-style-blink = true
