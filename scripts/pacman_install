@@ -135,18 +135,18 @@ function main {
             ;;
         *KDE*)
             echo "Setting up KDE Plasma Desktop..."
-            sudo pacman -S --needed \
-                sddm \
-                qt6-svg \
-                qt6-virtualkeyboard \
-                qt6-multimedia-ffmpeg
-            git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM && cd SilentSDDM && ./install.sh
+            yay -S sddm-silent-theme
             cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
             plasma-apply-wallpaperimage "$WALLPAPER"
             plasma-apply-cursortheme "miku-cursor-linux"
             $(locate plasma-changeicons) "circle-icons-dracula-dark"
             ;;
+        *niri*)
+            echo "Setting up Niri..."
+            yay -S sddm-silent-theme
+            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
+            sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
         *)
             echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
             ;;
@@ -180,10 +180,14 @@ function main {
     # Post-Install
     . ~/.profile && . ~/.bashrc
     clear && fastfetch
-    echo -e "\e[1;37mNext Steps\e[0m:"
+    echo -e "\e[1;4;37mNext Steps\e[0m:"
     echo -e "* Run \e[1;33m[sudo tailscale up]\e[0m and follow the link to set up \e[1;33mTailscale VPN\e[0m"
     echo -e "* Run \e[1;35m[chsh]\e[0m and change user shell to \e[1;35m/usr/bin/zsh\e[0m"
     echo -e "* Run \e[1;32m[tmux]\e[0m and press \e[1;32m[<ctrl>+b, i]\e[0m to install tmux plugins"
+    echo -e "\n\e[1;4;94mIF USING SDDM GREETER\e[0m"
+    echo -e "* Using \e[1;94msudo\e[0m, edit the \e[1;94m/usr/share/sddm/themes/silent/metadata.desktop\e[0m file and \nchange the un-commented file to the desired config file."
+    echo -e "* Using \e[1;94msudo\e[0m, edit the \e[1;94m/etc/sddm.conf\e[0m file and ensure \e[1m\n\`\`\`\n\t[Theme]\n\tCurrent=silent\n\`\`\`\n\e[0m is present."
+    echo -e "* Make sure to run \e[1;94m/usr/share/sddm/themes/silent/test.sh\e[0m to ensure the \ntheme works correctly."
 }
 
 main
