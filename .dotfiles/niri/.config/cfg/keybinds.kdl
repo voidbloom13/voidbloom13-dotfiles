@@ -12,6 +12,7 @@ binds {
     Mod+Return                          hotkey-overlay-title="Open Terminal: Ghostty" { spawn "ghostty"; }
     Mod+Space                           hotkey-overlay-title="Open App Launcher: Noctalia Launcher" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
     Mod+B                               hotkey-overlay-title="Open Browser: Google Chrome" { spawn "google-chrome-stable"; }
+    Mod+ALT+C                          hotkey-overlay-title="Launch OpenWebUI" { spawn "google-chrome-stable app='http://localhost:8282'"; }
     Mod+ALT+L                           hotkey-overlay-title="Lock Screen: Noctalia Lock" { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
     Mod+Shift+L                        hotkey-overlay-title="Session Menu: Noctalia Session Menu" { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
 
