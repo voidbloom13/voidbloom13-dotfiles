@@ -2,7 +2,6 @@
 
 FACE="$HOME/voidbloom13-dotfiles/assets/profile.jpg"
 WALLPAPER="$HOME/voidbloom13-dotfiles/assets/arch-wallpaper.jpg"
-TERM_WALLPAPER="$HOME/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
 
 function main {
     cd $HOME
@@ -46,9 +45,9 @@ function main {
         nodejs \
         npm \
         pgcli \
-        postgresql \
         python \
-        python-pip
+        python-pip \
+        python-pipx
 
     # Yay AUR Helper
     git clone https://aur.archlinux.org/yay
@@ -88,9 +87,6 @@ function main {
         typescript-language-server \
         @tailwindcss/language-server
 
-    # PostgreSQL Init
-    sudo -u postgres initdb -D /var/lib/postgres/data
-
     # Dotfiles Sync
     find "$HOME/voidbloom13-dotfiles/.dotfiles/" -mindepth 1 -maxdepth 1 -type d | while read -r package; do
         bash $HOME/voidbloom13-dotfiles/scripts/stow $(basename "$package")
@@ -105,9 +101,9 @@ function main {
             ttf-font-awesome \
             $(pacman -Sgq nerd-fonts)
 
-        yay -S google-chrome
+        yay -S google-chrome notion-app-electron
 
-        ln -s $TERM_WALLPAPER ~/.config/kitty/wallpaper.jpg
+        ln -s $WALLPAPER ~/.config/kitty/wallpaper.jpg
         git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
         sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
 
@@ -147,6 +143,7 @@ function main {
             yay -S sddm-silent-theme
             cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
             sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
+            ;;
         *)
             echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
             ;;
@@ -174,7 +171,6 @@ function main {
     # Systemd Services
     sudo systemctl enable --now docker
     sudo usermod -aG docker $USER
-    sudo systemctl enable --now postgresql
     sudo systemctl enable --now tailscaled
 
     # Post-Install

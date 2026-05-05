@@ -1,6 +1,6 @@
 # background-image = "~/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
 # background-image-fit = "cover"
-# maximize = true
+maximize = true
 background = 000000
 foreground = c8c8c8
 background-opacity = 0.5
