@@ -9,11 +9,11 @@ binds {
     Mod+Shift+ESCAPE                     { show-hotkey-overlay; }
 
     // ─── Applications ───
-    Mod+Return                          hotkey-overlay-title="Open Terminal: Ghostty" { spawn "ghostty"; }
-    Mod+Space                           hotkey-overlay-title="Open App Launcher: Noctalia Launcher" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
+    Mod+Return                          hotkey-overlay-title="Open Terminal: Kitty" { spawn "kitty"; }
+    Mod+Space                     hotkey-overlay-title="Open App Launcher: noctalia launcher" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
     Mod+B                               hotkey-overlay-title="Open Browser: Google Chrome" { spawn "google-chrome-stable"; }
-    Mod+ALT+L                           hotkey-overlay-title="Lock Screen: Noctalia Lock" { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
-    Mod+Shift+L                        hotkey-overlay-title="Session Menu: Noctalia Session Menu" { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
+    Mod+ALT+L                           hotkey-overlay-title="Lock Screen: noctalia lock" { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
+    Mod+Shift+Q                        hotkey-overlay-title="Session Menu: noctalia sessionMenu" { spawn-sh "qs -c noctalia-shell ipc call sessionMenu toggle"; }
 
     // Please choose your own file manager.
     Mod+E                               hotkey-overlay-title="File Manager: Nautilus" { spawn "nautilus"; }
@@ -107,7 +107,7 @@ binds {
     Mod+TAB                             { focus-workspace-previous; }
 
     // ─── Layout Controls ───
-    Mod+F                               { expand-column-to-available-width; }
+    Mod+CTRL+F                          { expand-column-to-available-width; }
     Mod+C                               { center-column; }
     Mod+CTRL+C                          { center-visible-columns; }
     Mod+Minus                           { set-column-width "-10%"; }
@@ -117,7 +117,7 @@ binds {
 
     // ─── Modes ───
     Mod+T                               { toggle-window-floating; }
-    Mod+CTRL+F                          { fullscreen-window; }
+    Mod+F                               { fullscreen-window; }
     Mod+W                               { toggle-column-tabbed-display; }
 
     // ─── Screenshots ───
