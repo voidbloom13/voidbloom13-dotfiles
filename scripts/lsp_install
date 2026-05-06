@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+sudo pacman -S \
+	pyright \
+	typescript-language-server \
+	vscode-html-languageserver \
+	vscode-css-languageserver \
+	vscode-json-languageserver \
+	bash-language-server \
+	lua-language-server \
+	marksman \
+	dockerfile-language-server \
+	yaml-language-server
+
+yay -S jdtls
+
+dotnet tool install --global csharp-ls

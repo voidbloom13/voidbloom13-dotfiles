@@ -1,0 +1,42 @@
+theme = "void_transparent"
+
+[editor]
+line-number = "relative"
+cursorline = true
+color-modes = true
+auto-format = true
+idle-timeout = 50
+completion-trigger-len = 1
+gutters = ["diagnostics", "spacer", "line-numbers", "spacer", "diff"]
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.indent-guides]
+render = true
+character = "|"
+skip-levels = 1
+
+[editor.whitespace.render]
+space = "none"
+tab = "all"
+newline = "none"
+
+[editor.whitespace.characters]
+tab = "→"
+tabpad = "·"
+
+[editor.statusline]
+left = ["mode", "spacer", "spinner", "file-name", "file-modification-indicator"]
+center = []
+right = ["diagnostics", "selections", "position", "file-encoding", "file-type"]
+separator = "|"
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"

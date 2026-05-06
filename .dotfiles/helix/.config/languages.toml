@@ -1,0 +1,114 @@
+[language-server.csharp-ls]
+command = "csharp-ls"
+
+[language-server.pyright]
+command = "pyright-langserver"
+args = ["--stdio"]
+
+[language-server.vscode-html-languageserver]
+command = "vscode-html-languageserver"
+args = ["--stdio"]
+
+[language-server.vscode-css-languageserver]
+command = "vscode-css-languageserver"
+args = ["--stdio"]
+
+[language-server.vscode-json-languageserver]
+command = "vscode-json-languageserver"
+args = ["--stdio"]
+
+[language-server.bash-language-server]
+command = "bash-language-server"
+args = ["start"]
+
+[language-server.lua-language-server]
+command = "lua-language-server"
+
+[language-server.marksman]
+command = "marksman"
+args = ["server"]
+
+[language-server.docker-langserver]
+command = "docker-langserver"
+args = ["--stdio"]
+
+[language-server.yaml-language-server]
+command = "yaml-language-server"
+args = ["--stdio"]
+
+[language-server.typescript-language-server]
+command = "typescript-language-server"
+args = ["--stdio"]
+
+[language-server.jdtls]
+command = "jdtls"
+
+[[language]]
+name = "python"
+scope = "source.python"
+language-servers = [ "pyright" ]
+
+[[language]]
+name = "c-sharp"
+scope = "source.csharp"
+language-servers = [ "csharp-ls" ]
+
+[[language]]
+name = "html"
+scope = "text.html"
+language-servers = [ "vscode-html-languageserver" ]
+
+[[language]]
+name = "css"
+scope = "source.css"
+language-servers = [ "vscode-css-languageserver" ]
+
+[[language]]
+name = "json"
+scope = "source.json"
+language-servers = [ "vscode-json-languageserver" ]
+
+[[language]]
+name = "bash"
+scope = "source.bash"
+language-servers = [ "bash-language-server" ]
+
+[[language]]
+name = "lua"
+scope = "source.lua"
+language-servers = [ "lua-language-server" ]
+
+[[language]]
+name = "markdown"
+scope = "text.html.markdown"
+language-servers = [ "marksman" ]
+
+[[language]]
+name = "dockerfile"
+scope = "source.dockerfile"
+language-servers = [ "docker-langserver" ]
+
+[[language]]
+name = "yaml"
+scope = "source.yaml"
+language-servers = [ "yaml-language-server" ]
+
+[[language]]
+name = "docker-compose"
+scope = "source.docker-compose"
+language-servers = [ "yaml-language-server" ]
+
+[[language]]
+name = "typescript"
+scope = "source.ts"
+language-servers = [ "typescript-language-server" ]
+
+[[language]]
+name = "javascript"
+scope = "source.js"
+language-servers = [ "typescript-language-server" ]
+
+[[language]]
+name = "java"
+scope = "source.java"
+language-servers = [ "jdtls" ]
