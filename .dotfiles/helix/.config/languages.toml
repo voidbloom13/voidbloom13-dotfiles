@@ -39,6 +39,7 @@ args = ["--stdio"]
 [language-server.typescript-language-server]
 command = "typescript-language-server"
 args = ["--stdio"]
+config = { initializationOptions = { disableAutomaticTypingAcquisition = true }}
 
 [language-server.jdtls]
 command = "jdtls"
