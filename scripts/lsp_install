@@ -1,17 +1,40 @@
 #!/usr/bin/bash
 
-sudo pacman -S \
-	pyright \
-	typescript-language-server \
-	vscode-html-languageserver \
-	vscode-css-languageserver \
-	vscode-json-languageserver \
+# Ensure pacman is up to date
+sudo pacman -Sy
+
+# Install LSPs and Formatters available in official/CachyOS repos
+sudo pacman -S --needed \
 	bash-language-server \
+	dockerfile-language-server \
 	lua-language-server \
 	marksman \
-	dockerfile-language-server \
+	prettier \
+	pyright \
+	python-black \
+	ruff \
+	shfmt \
+	stylua \
+	tailwindcss-language-server \
+	taplo-cli \
+	typescript-language-server \
+	vscode-css-languageserver \
+	vscode-html-languageserver \
+	vscode-json-languageserver \
 	yaml-language-server
 
-yay -S jdtls
+# Install JDTLS (Java LSP)
+if command -v yay >/dev/null 2>&1; then
+	yay -S --needed jdtls
+else
+	sudo pacman -S --needed jdtls
+fi
 
-dotnet tool install --global csharp-ls
+# Install C# Language Server via dotnet tool
+if command -v dotnet >/dev/null 2>&1; then
+	dotnet tool install --global csharp-ls || dotnet tool update --global csharp-ls
+else
+	echo "Warning: dotnet not found. Please install dotnet-sdk to use csharp-ls."
+fi
+
+echo "LSP and Formatter installation complete!"

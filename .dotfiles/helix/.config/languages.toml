@@ -5,9 +5,16 @@ command = "csharp-ls"
 command = "pyright-langserver"
 args = ["--stdio"]
 
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
 [language-server.vscode-html-languageserver]
 command = "vscode-html-languageserver"
 args = ["--stdio"]
+
+[language-server.tailwindcss-ls]
+command = "tailwindcss-language-server"
 
 [language-server.vscode-css-languageserver]
 command = "vscode-css-languageserver"
@@ -44,72 +51,147 @@ config = { initializationOptions = { disableAutomaticTypingAcquisition = true }}
 [language-server.jdtls]
 command = "jdtls"
 
+[language-server.taplo]
+command = "taplo"
+args = ["lsp", "stdio"]
+
 [[language]]
 name = "python"
 scope = "source.python"
-language-servers = [ "pyright" ]
+language-servers = [ "pyright", "ruff" ]
+formatter = { command = "ruff", args = ["format", "-"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "c-sharp"
 scope = "source.csharp"
 language-servers = [ "csharp-ls" ]
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "html"
 scope = "text.html"
-language-servers = [ "vscode-html-languageserver" ]
+language-servers = [ "vscode-html-languageserver", "tailwindcss-ls" ]
+formatter = { command = "prettier", args = ["--parser", "html", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "css"
 scope = "source.css"
-language-servers = [ "vscode-css-languageserver" ]
+language-servers = [ "vscode-css-languageserver", "tailwindcss-ls" ]
+formatter = { command = "prettier", args = ["--parser", "css", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "json"
 scope = "source.json"
 language-servers = [ "vscode-json-languageserver" ]
+formatter = { command = "prettier", args = ["--parser", "json", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "jsonc"
+scope = "source.jsonc"
+language-servers = [ "vscode-json-languageserver" ]
+formatter = { command = "prettier", args = ["--parser", "json", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "bash"
 scope = "source.bash"
 language-servers = [ "bash-language-server" ]
+formatter = { command = "shfmt", args = ["-i", "4", "-"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "lua"
 scope = "source.lua"
 language-servers = [ "lua-language-server" ]
+formatter = { command = "stylua", args = ["--indent-type", "Spaces", "--indent-width", "4", "-"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "markdown"
 scope = "text.html.markdown"
 language-servers = [ "marksman" ]
+formatter = { command = "prettier", args = ["--parser", "markdown", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "dockerfile"
 scope = "source.dockerfile"
 language-servers = [ "docker-langserver" ]
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "yaml"
 scope = "source.yaml"
 language-servers = [ "yaml-language-server" ]
+formatter = { command = "prettier", args = ["--parser", "yaml", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "docker-compose"
 scope = "source.docker-compose"
 language-servers = [ "yaml-language-server" ]
+formatter = { command = "prettier", args = ["--parser", "yaml", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "toml"
+scope = "source.toml"
+language-servers = [ "taplo" ]
+formatter = { command = "taplo", args = ["fmt", "--option", "indent_string=    ", "-"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "typescript"
 scope = "source.ts"
 language-servers = [ "typescript-language-server" ]
+formatter = { command = "prettier", args = ["--parser", "typescript", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "tsx"
+scope = "source.tsx"
+language-servers = [ "typescript-language-server", "tailwindcss-ls"]
+formatter = { command = "prettier", args = ["--parser", "typescript", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "javascript"
 scope = "source.js"
 language-servers = [ "typescript-language-server" ]
+formatter = { command = "prettier", args = ["--parser", "typescript", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "jsx"
+scope = "source.jsx"
+language-servers = [ "typescript-language-server", "tailwindcss-ls"]
+formatter = { command = "prettier", args = ["--parser", "typescript", "--tab-width", "4"] }
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
 
 [[language]]
 name = "java"
 scope = "source.java"
 language-servers = [ "jdtls" ]
+auto-format = true
+indent = { tab-width = 4, unit = "    " }
