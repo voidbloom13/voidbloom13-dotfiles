@@ -10,6 +10,6 @@ export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local
 alias ll="ls -la --color=auto"
 alias ls="ls -a --color=auto"
 if [[ -x "$(command -v pgcli)" ]]; then
-  alias psql="pgcli"
+    alias psql="pgcli"
 fi
-alias intellij="flatpak run com.jetbrains.IntelliJ-IDEA-Community"
+alias hx="helix"
