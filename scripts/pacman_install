@@ -34,7 +34,8 @@ function main {
 
     # Docker
     sudo pacman -Syu \
-        docker
+        docker \
+        docker-compose
 
     # Languages
     sudo pacman -Syu \
@@ -114,40 +115,40 @@ function main {
 
     # DE-Specific Setup
     case "$XDG_CURRENT_DESKTOP" in
-        *GNOME*)
-            echo "Setting up Gnome Desktop..."
-            sudo pacman -Syu \
-                gnome \
-                gnome-tweaks \
-                extension-manager
-            yay -S \
-                gdm-settings
+    *GNOME*)
+        echo "Setting up Gnome Desktop..."
+        sudo pacman -Syu \
+            gnome \
+            gnome-tweaks \
+            extension-manager
+        yay -S \
+            gdm-settings
 
-            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face
-            sudo busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$(id -u) org.freedesktop.Accounts.User SetIconFile s "$HOME/.face"
-            gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER"
-            gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER"
-            gsettings set org.gnome.desktop.interface cursor-theme "miku-cursor-linux"
-            gsettings set org.gnome.desktop.interface icon-theme "circle-icons-dracula-dark"
-            ;;
-        *KDE*)
-            echo "Setting up KDE Plasma Desktop..."
-            yay -S sddm-silent-theme
-            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
-            sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
-            plasma-apply-wallpaperimage "$WALLPAPER"
-            plasma-apply-cursortheme "miku-cursor-linux"
-            $(locate plasma-changeicons) "circle-icons-dracula-dark"
-            ;;
-        *niri*)
-            echo "Setting up Niri..."
-            yay -S sddm-silent-theme
-            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
-            sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
-            ;;
-        *)
-            echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
-            ;;
+        cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face
+        sudo busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$(id -u) org.freedesktop.Accounts.User SetIconFile s "$HOME/.face"
+        gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER"
+        gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER"
+        gsettings set org.gnome.desktop.interface cursor-theme "miku-cursor-linux"
+        gsettings set org.gnome.desktop.interface icon-theme "circle-icons-dracula-dark"
+        ;;
+    *KDE*)
+        echo "Setting up KDE Plasma Desktop..."
+        yay -S sddm-silent-theme
+        cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
+        sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
+        plasma-apply-wallpaperimage "$WALLPAPER"
+        plasma-apply-cursortheme "miku-cursor-linux"
+        $(locate plasma-changeicons) "circle-icons-dracula-dark"
+        ;;
+    *niri*)
+        echo "Setting up Niri..."
+        yay -S sddm-silent-theme
+        cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
+        sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
+        ;;
+    *)
+        echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
+        ;;
     esac
 
     # Git and Github Setup
@@ -155,18 +156,18 @@ function main {
     read -p "Setup git/github? [Y/n] " setup_git
     setup_git=${setup_git:-Y}
     case $setup_git in
-        [yY] )
-            read -p "Git config name: " git_name
-            read -p "Git config email: " git_email
-            git config --global user.name "$git_name" && git config --global user.email "$git_email"
-            gh auth login
-            ;;
-        [nN] )
-            echo "Exiting git setup..."
-            ;;
-        * )
-            echo "Exiting git setup..."
-            ;;
+    [yY])
+        read -p "Git config name: " git_name
+        read -p "Git config email: " git_email
+        git config --global user.name "$git_name" && git config --global user.email "$git_email"
+        gh auth login
+        ;;
+    [nN])
+        echo "Exiting git setup..."
+        ;;
+    *)
+        echo "Exiting git setup..."
+        ;;
     esac
 
     # Systemd Services
