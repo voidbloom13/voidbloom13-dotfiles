@@ -60,6 +60,13 @@ function hypr_setup {
 }
 
 
+function dotfiles_setup {
+    # Dotfiles Sync
+    find "$HOME/voidbloom13-dotfiles/.dotfiles/" -mindepth 1 -maxdepth 1 -type d | while read -r package; do
+        bash $HOME/voidbloom13-dotfiles/scripts/stow $(basename "$package")
+    done
+}
+
 function git_setup {
     # Git Config and GH Authorization
     echo -e "\e[1;44;87m             Git and Github Setup             \e[0m"
