@@ -125,7 +125,6 @@ EOF
     find "$HOME/voidbloom13-dotfiles/.dotfiles/" -mindepth 1 -maxdepth 1 -type d | while read -r package; do
         bash $HOME/voidbloom13-dotfiles/scripts/stow $(basename "$package")
     done
-    ln -s $HOME/voidbloom13-dotfiles/.prettierrc.json $HOME/.prettierrc.json
 
     # GUI Apps
     if ! uname -a | grep -q WSL && (pgrep -l "Xorg" || pgrep -l "wayland"); then

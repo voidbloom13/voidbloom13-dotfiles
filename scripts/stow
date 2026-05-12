@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DOTFILES_DIR="$HOME/voidbloom13-dotfiles/.dotfiles"
-BACKUP_DIR="$HOME/.config/.backups"
+BACKUP_DIR="$HOME/.config/backups"
 PACKAGE=$1
 
 if [ -z "$PACKAGE" ]; then
@@ -24,43 +24,37 @@ echo "Checking for conflicts for package '$PACKAGE'..."
 STOW_COMMAND_OPTIONS=()
 STOW_COMMAND_PACKAGE_ARG="$PACKAGE"
 
-# This will be the directory whose *contents* stow will try to link
-ACTUAL_STOW_SOURCE_CONTENTS_DIR="$SRC_PACKAGE_DIR"
-
-# This will be the final root directory where the links will appear
-FINAL_TARGET_ROOT_DIR="$HOME"
-
 if [ -d "$SRC_PACKAGE_DIR/.config/$PACKAGE" ]; then
     # Type 2: e.g., nvim -> .dotfiles/nvim/.config/nvim/
-    # Stow from DOTFILES_DIR to HOME, package is nvim.
-    # This will result in ~/.config/nvim/
     echo "  -> Detected Type 2: .config/$PACKAGE structure (e.g., nvim)."
-    # Default options for stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE" are fine.
+    STOW_SOURCE_DIR="$SRC_PACKAGE_DIR/.config"
+    TARGET_DIR="$HOME/.config"
 elif [ -d "$SRC_PACKAGE_DIR/.config" ]; then
     # Type 3: e.g., hypr -> .dotfiles/hypr/.config/hyprland.conf
-    # Stow contents of .dotfiles/hypr/.config to ~/.config/hypr/
     echo "  -> Detected Type 3: .config/ direct contents structure (e.g., hypr)."
+    STOW_SOURCE_DIR="$SRC_PACKAGE_DIR/.config"
+    TARGET_DIR="$HOME/.config/$PACKAGE"
+    mkdir -p "$TARGET_DIR"
     STOW_COMMAND_OPTIONS+=("-d" "$SRC_PACKAGE_DIR/.config")
-    STOW_COMMAND_PACKAGE_ARG="." # Stow everything in STOW_BASE_DIR
-    FINAL_TARGET_ROOT_DIR="$HOME/.config/$PACKAGE"
-    mkdir -p "$FINAL_TARGET_ROOT_DIR"
+    STOW_COMMAND_PACKAGE_ARG="."
 else
     # Type 1: e.g., bash -> .dotfiles/bash/.bashrc
-    # Stow from DOTFILES_DIR to HOME, package is bash.
-    # This will result in ~/.bashrc
     echo "  -> Detected Type 1: Direct home link structure (e.g., bash)."
-    # Default options for stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE" are fine.
+    STOW_SOURCE_DIR="$SRC_PACKAGE_DIR"
+    TARGET_DIR="$HOME"
 fi
 
 # Helper function to process conflicts
 process_conflict() {
     local target_path="$1"
-    local relative_path="$2" # For display purposes
+    local relative_path="$2"
 
     if [ -e "$target_path" ] && [ ! -L "$target_path" ]; then
         echo "Conflict found for: $relative_path"
-        mv "$target_path" "$BACKUP_DIR/$(basename "$target_path").bak"
-        echo " -> Moved existing file to $BACKUP_DIR/$(basename "$target_path").bak"
+        local timestamp=$(date +%Y%m%d_%H%M%S)
+        local backup_name="${PACKAGE}_$(basename "$target_path")_${timestamp}.bak"
+        mv "$target_path" "$BACKUP_DIR/$backup_name"
+        echo " -> Moved existing $([ -d "$target_path" ] && echo "directory" || echo "file") to $BACKUP_DIR/$backup_name"
     elif [ -L "$target_path" ]; then
         echo "Removing existing symlink at: $target_path"
         echo "$(date): $target_path -> $(readlink "$target_path")" >> "$HOME/.symlink_log"
@@ -69,31 +63,12 @@ process_conflict() {
     fi
 }
 
-# The find command will list items that stow would attempt to link
-find "$ACTUAL_STOW_SOURCE_CONTENTS_DIR" -mindepth 1 -maxdepth 1 | while read -r src_item_path; do
+# Scan for conflicts at the top level of the source
+find "$STOW_SOURCE_DIR" -mindepth 1 -maxdepth 1 | while read -r src_item_path; do
     item_name=$(basename "$src_item_path")
-    
-    # Construct the full target path where stow would try to place this item
-    conflict_target_path="$FINAL_TARGET_ROOT_DIR/$item_name"
-    
-    # Construct a relative path for display in messages
-    display_relative_path=""
-    if [ "$FINAL_TARGET_ROOT_DIR" = "$HOME" ]; then
-        display_relative_path="$item_name"
-    elif [[ "$FINAL_TARGET_ROOT_DIR" == "$HOME/.config/"* ]]; then
-        # This handles cases like ~/.config/hypr/hyprland.conf or ~/.config/nvim/init.lua
-        # It takes the part after $HOME/ and appends the item_name
-        # The sed command is to clean up cases where PACKAGE might already be part of the path (e.g. for nvim after the .config)
-        # However, for Type 3, FINAL_TARGET_ROOT_DIR will already be $HOME/.config/$PACKAGE, so it's simpler.
-        display_relative_path=".config/${FINAL_TARGET_ROOT_DIR#$HOME/.config/}/$item_name"
-        display_relative_path=$(echo "$display_relative_path" | sed 's/\/\.\//\//g')
-    else
-        display_relative_path="${FINAL_TARGET_ROOT_DIR#$HOME/}/$item_name"
-    fi
-
-    process_conflict "$conflict_target_path" "$display_relative_path"
+    conflict_target_path="$TARGET_DIR/$item_name"
+    process_conflict "$conflict_target_path" "$item_name"
 done
-
 
 echo "Stowing package '$PACKAGE'..."
 if [ ${#STOW_COMMAND_OPTIONS[@]} -eq 0 ]; then
@@ -101,6 +76,7 @@ if [ ${#STOW_COMMAND_OPTIONS[@]} -eq 0 ]; then
     stow -d "$DOTFILES_DIR" -t "$HOME" "$PACKAGE"
 else
     # Custom stow command for Type 3 packages
-    stow "${STOW_COMMAND_OPTIONS[@]}" -t "$FINAL_TARGET_ROOT_DIR" "$STOW_COMMAND_PACKAGE_ARG"
+    stow "${STOW_COMMAND_OPTIONS[@]}" -t "$TARGET_DIR" "$STOW_COMMAND_PACKAGE_ARG"
 fi
 echo "Done."
+
