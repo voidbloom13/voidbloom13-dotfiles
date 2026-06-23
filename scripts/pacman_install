@@ -19,6 +19,7 @@ function main {
         git \
         github-cli \
         helix \
+        libvncserver \
         man-db \
         neovim \
         ripgrep \
@@ -99,6 +100,7 @@ function main {
         sudo pacman -Syu \
             ghostty \
             kitty \
+            remmina \
             ttf-font-awesome \
             $(pacman -Sgq nerd-fonts)
 

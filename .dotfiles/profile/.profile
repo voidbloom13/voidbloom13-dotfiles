@@ -13,3 +13,7 @@ if [[ -x "$(command -v pgcli)" ]]; then
     alias psql="pgcli"
 fi
 alias hx="helix"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/xvoid/.local/bin:$PATH"
