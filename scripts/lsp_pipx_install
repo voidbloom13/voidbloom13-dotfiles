@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+if ! command -v pipx >/dev/null 2>&1; then
+	if command -v pacman >/dev/null 2>&1; then
+		sudo pacman -Syu --needed --noconfirm python-pipx
+	elif command -v dnf >/dev/null 2>&1; then
+		sudo dnf install -y pipx
+	elif command -v apt >/dev/null 2>&1; then
+		sudo apt-get update && sudo apt-get install -y pipx
+	elif command -v brew >/dev/null 2>&1; then
+		brew install pipx
+	else
+		printf "\e[1;31mERROR\e[0m Unsupported package manager\n"
+		printf "Supported package managers are:\n"
+		printf "    - pacman\n"
+		printf "    - dnf\n"
+		printf "    - apt\n"
+		printf "    - homebrew\n"
+	fi
+fi
+
+pipx ensurepath
+
+pipx install \
+	black \
+	ruff

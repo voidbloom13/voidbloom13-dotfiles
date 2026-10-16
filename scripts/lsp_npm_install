@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+if ! command -v npm >/dev/null 2>&1; then
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+    . $HOME/.bashrc && . $HOME/.profile
+    nvm install --lts && nvm use --lts
+fi
+
+npm install -g \
+	bash-language-server \
+	dockerfile-language-server \
+	prettier \
+	pyright \
+	@johnnymorganz/stylua-bin \
+	@taplo/cli \
+	@tailwindcss/language-server \
+	typescript \
+	typescript-language-server \
+	vscode-langservers-extracted \
+	yaml-language-server

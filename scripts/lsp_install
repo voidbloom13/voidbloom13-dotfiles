@@ -7,6 +7,7 @@ sudo pacman -Sy
 sudo pacman -S --needed \
 	bash-language-server \
 	dockerfile-language-server \
+	jdtls \
 	lua-language-server \
 	marksman \
 	prettier \
@@ -24,11 +25,11 @@ sudo pacman -S --needed \
 	yaml-language-server
 
 # Install JDTLS (Java LSP)
-if command -v yay >/dev/null 2>&1; then
-	yay -S --needed jdtls
-else
-	sudo pacman -S --needed jdtls
-fi
+# if command -v yay >/dev/null 2>&1; then
+# 	yay -S --needed jdtls
+# else
+# 	sudo pacman -S --needed jdtls
+# fi
 
 # Install C# Language Server via dotnet tool
 if command -v dotnet >/dev/null 2>&1; then

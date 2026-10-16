@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-
-FACE="$HOME/voidbloom13-dotfiles/assets/profile.jpg"
-WALLPAPER="$HOME/voidbloom13-dotfiles/assets/fedora-wallpaper.jpg"
-TERM_WALLPAPER="$HOME/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
+set -eou pipefail
 
 function main {
     # System Update
@@ -12,6 +9,8 @@ function main {
     sudo dnf install -y --skip-unavailable \
         bat \
         dnf-plugins-core \
+        dotnet-sdk-10.0 \
+        eza \
         fastfetch \
         flatpak \
         fzf \
@@ -19,12 +18,9 @@ function main {
         git \
         gh \
         man-pages \
-        neovim \
         ripgrep \
         rsync \
         stow \
-        tailscale \
-        tmux \
         tree \
         unzip \
         zip \
@@ -44,124 +40,97 @@ function main {
         docker-engine-selinux \
         docker-engine
     sudo dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
-    sudo dnf install -y --skip-unavailable \
+    sudo dnf install -y \
         docker-ce \
         docker-ce-cli \
         containerd.io \
         docker-buildx-plugin \
         docker-compose-plugin
 
-    # Languages
-    sudo dnf install -y --skip-unavailable \
-        dotnet-sdk-10.0 \
-        java-latest-openjdk \
-        maven \
-        nodejs \
-        postgresql-server \
-        postgresql-contrib \
-        python3 \
-        python3-pip
-
     # RPM Fusion
     sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
     sudo dnf install -y https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
     sudo dnf install -y fedora-workstation-repositories
 
-    # Claude Code
-    curl -fsSL https://claude.ai/install.sh | bash
-
     # NVM and NodeJS LTS
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-    . $HOME/.bashrc && . $HOME/.profile
-    nvm install --lts && nvm use --lts
-
-    # SDKMAN and Spring CLI
-    curl -s "https://get.sdkman.io" | bash
-    source "$HOME/.sdkman/bin/sdkman-init.sh"
-    sdk install springboot
-
-    # TMUX Theme and TPM
-    mkdir -p ~/.config/tmux/plugins/catppuccin
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    git clone -b v2.1.3 https://github.com/catppuccin/tmux.git ~/.config/tmux/plugins/catppuccin/tmux
+    if ! command -v nvm >/dev/null 2>&1; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+        . "$NVM_DIR/nvm.sh"
+        nvm install --lts && nvm use --lts
+    fi
 
     # NPM Packages
     npm install -g \
         @angular/cli \
         @angular/language-server \
-        @google/gemini-cli \
-        nodemon \
         prettier-plugin-tailwindcss \
         typescript \
         typescript-language-server \
         @tailwindcss/language-server
-
-    # PostgreSQL Init
-    sudo postgresql-setup --initdb --unit postgresql
 
     # Dotfiles Sync
     find "$HOME/voidbloom13-dotfiles/.dotfiles/" -mindepth 1 -maxdepth 1 -type d | while read -r package; do
         bash $HOME/voidbloom13-dotfiles/scripts/stow $(basename "$package")
     done
 
-    # GUI Apps
-    if ! uname -a | grep -q WSL && (pgrep -l "Xorg" || pgrep -l "wayland"); then
-        sudo dnf config-manager --enable google-chrome
-        sudo dnf copr enable scottames/ghostty
-        sudo dnf install -y --skip-unavailable \
-            ghostty \
-            google-chrome-stable \
-            kitty
+    # TODO: Install Chrome, Kitty/Ghostty, Nerd Fonts, etc. when running a desktop env.
+    if ! grep -qi microsoft /proc/sys/kernel/osrelease; then
+        if [[ -n "${WAYLAND_DISPLAY:-}" || -n "${DISPLAY:-}" ]]; then
+            sudo dnf config-manager --enable google-chrome
+            sudo dnf copr enable scottames/ghostty
+            sudo dnf install -y --skip-unavailable \
+                ghostty \
+                google-chrome \
+                kitty
 
-        git clone --depth=1 https://github.com/ryanoasis/nerd-fonts $HOME/Downloads/nerd-fonts
-        cd $HOME/Downloads/nerd-fonts/
-        ./install.sh
+            # TODO: Clone only desired nerd fonts and install them
+            # git clone --depth=1 https://github.com/ryanoasis/nerd-fonts $HOME/Downloads/nerd-fonts
+            # cd $HOME/Downloads/nerd-fonts/
+            # ./install.sh
 
-        ln -s $TERM_WALLPAPER ~/.config/kitty/wallpaper.jpg
-        git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
-        sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
+            git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
+            sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
 
-        git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-icons
-        sudo $HOME/Downloads/circle-icons/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons"
+            git clone https://github.com/vinceliuice/tela-circle-icon-theme $HOME/Downloads/circle-icons
+            sudo $HOME/Downloads/circle-icons/install.sh -c dracula -d /usr/share/icons/ -n "circle-icons"
+
+            case "$XDG_CURRENT_DESKTOP" in
+                *GNOME*)
+                    echo "Setting up Gnome Desktop..."
+                    sudo dnf install -y --skip-unavailable \
+                        gnome-tweaks \
+                        gnome-extensions-app
+                    flatpak install GdmSettings
+
+                    cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face
+                    sudo busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$(id -u) org.freedesktop.Accounts.User SetIconFile s "$HOME/.face"
+                    gsettings set org.gnome.desktop.interface cursor-theme "miku-cursor-linux"
+                    gsettings set org.gnome.desktop.interface icon-theme "circle-icons-dracula-dark"
+                    ;;
+                *KDE*)
+                    echo "Setting up KDE Plasma Desktop..."
+                    sudo dnf install -y --skip-unavailable \
+                        sddm \
+                        qt6-qtsvg \
+                        qt6-qtvirtualkeyboard \
+                        qt6-qtmultimedia
+                    git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM && cd SilentSDDM && ./install.sh
+                    cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
+                    sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
+                    plasma-apply-cursortheme "miku-cursor-linux"
+                    if command -v plasma-changeicons >/dev/null 2>&1; then
+                        plasma-changeicons "circle-icons-dracula-dark"
+                    fi
+                    ;;
+                *)
+                    echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
+                    ;;
+            esac
+        fi
     fi
-
-    # DE-Specific Setup
-    case "$XDG_CURRENT_DESKTOP" in
-        *GNOME*)
-            echo "Setting up Gnome Desktop..."
-            sudo dnf install -y --skip-unavailable \
-                gnome-tweaks \
-                gnome-extensions-app
-            flatpak install GdmSettings
-
-            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face
-            sudo busctl call org.freedesktop.Accounts /org/freedesktop/Accounts/User$(id -u) org.freedesktop.Accounts.User SetIconFile s "$HOME/.face"
-            gsettings set org.gnome.desktop.background picture-uri "file://$WALLPAPER"
-            gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALLPAPER"
-            gsettings set org.gnome.desktop.interface cursor-theme "miku-cursor-linux"
-            gsettings set org.gnome.desktop.interface icon-theme "circle-icons-dracula-dark"
-            ;;
-        *KDE*)
-            echo "Setting up KDE Plasma Desktop..."
-            sudo dnf install -y --skip-unavailable \
-                sddm \
-                qt6-qtsvg \
-                qt6-qtvirtualkeyboard \
-                qt6-qtmultimedia
-            git clone -b main --depth=1 https://github.com/uiriansan/SilentSDDM && cd SilentSDDM && ./install.sh
-            cp $HOME/voidbloom13-dotfiles/assets/profile.jpg $HOME/.face.icon
-            sudo cp $HOME/.face.icon /usr/share/sddm/faces/$(whoami).face.icon
-            plasma-apply-wallpaperimage "$WALLPAPER"
-            plasma-apply-cursortheme "miku-cursor-linux"
-            $(locate plasma-changeicons) "circle-icons-dracula-dark"
-            ;;
-        *)
-            echo "$XDG_CURRENT_DESKTOP not supported. Please ensure settings are configured manually."
-            ;;
-    esac
 
     # Git and Github Setup
     echo -e "\e[1;44;87m             Git and Github Setup             \e[0m"
@@ -185,16 +154,12 @@ function main {
     # Systemd Services
     sudo systemctl enable --now docker
     sudo usermod -aG docker $USER
-    sudo systemctl enable --now postgresql
-    sudo systemctl enable --now tailscaled
 
     # Post-Install
     . ~/.profile && . ~/.bashrc
     clear && fastfetch
     echo -e "\e[1;37mNext Steps\e[0m:"
-    echo -e "* Run \e[1;33m[sudo tailscale up]\e[0m and follow the link to set up \e[1;33mTailscale VPN\e[0m"
     echo -e "* Run \e[1;35m[chsh]\e[0m and change user shell to \e[1;35m/usr/bin/zsh\e[0m"
-    echo -e "* Run \e[1;32m[tmux]\e[0m and press \e[1;32m[<ctrl>+b, i]\e[0m to install tmux plugins"
 }
 
 main

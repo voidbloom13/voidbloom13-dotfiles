@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+function npm_install() {
+	npm install --global \
+	bash-language-server \
+	dockerfile-language-server \
+	prettier \
+	@johnnymorganz/stylua-bin \
+	@taplo/cli \
+	@tailwindcss/language-server \
+	typescript \
+	typescript-language-server \
+	vscode-langservers-extracted \
+	yaml-language-server
+}
+
+function dotnet_install() {
+	if command -v dotnet >/dev/null 2>&1 &&
+		dotnet --list-sdks 2>/dev/null | grep -q .; then
+			if dotnet tool list --global | grep -q '^csharp-ls '; then
+				dotnet tool update --global csharp-ls
+			else
+				dotnet tool install --global csharp-ls
+			fi
+	else
+		printf "\e[1;31mERROR\e[0m .NET SDK required for installation.\n"
+		exit 1
+	fi
+}
+
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+	. "$NVM_DIR/nvm.sh"
+fi
+if ! command -v nvm >/dev/null 2>&1; then
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+	. "$NVM_DIR/nvm.sh"
+fi
+nvm install --lts && nvm use --lts
+
+if command -v pacman >/dev/null 2>&1; then
+	sudo pacman -Syu --needed --noconfirm \
+		dotnet-sdk \
+		helix 
+elif command -v dnf >/dev/null 2>&1; then
+	sudo dnf install -y \
+		dotnet-sdk-10.0 \
+		helix
+elif command -v apt >/dev/null 2>&1; then
+	sudo apt-get update && sudo apt-get install -y \
+		dotnet-sdk-10.0 \
+		hx 
+elif command -v brew >/dev/null 2>&1; then
+	brew install \
+		dotnet \
+		helix 
+else
+	printf "\e[1;31mERROR\e[0m Unsupported package manager\n"
+	printf "Supported package managers are:\n"
+	printf "    - pacman\n"
+	printf "    - dnf\n"
+	printf "    - apt\n"
+	printf "    - homebrew\n"
+	exit 1
+fi
+
+npm_install
+dotnet_install
