@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -eou pipefail
 
 function main {
     # System Update

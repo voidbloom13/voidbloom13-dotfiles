@@ -1,9 +1,10 @@
-# background-image = "~/voidbloom13-dotfiles/assets/terminal-wallpaper.jpg"
-# background-image-fit = "cover"
-# maximize = true
+background-image = "~/voidbloom13-dotfiles/assets/terminal-wallpaper.png"
+background-image-fit = "cover"
+maximize = true
 background = 000000
 foreground = c8c8c8
-background-opacity = 0.5
+background-image-opacity = 0.2
+background-opacity = 1
 background-blur = true
 cursor-style = block
 cursor-color = 0088ff
@@ -14,7 +15,7 @@ theme = "Catppuccin Mocha"
 window-padding-x = 0
 window-padding-y = 0
 window-theme = ghostty
-window-titlebar-background = 000067
+window-titlebar-background = 202020
 
 font-family = "FiraCode Nerd Font"
 font-family-bold = "FiraCode Nerd Font"

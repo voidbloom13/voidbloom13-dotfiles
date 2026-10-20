@@ -12,6 +12,7 @@ function main {
         bat \
         cifs-utils \
         curl \
+        eza \
         fastfetch \
         flatpak \
         fzf \
@@ -21,14 +22,13 @@ function main {
         helix \
         libvncserver \
         man-db \
-        neovim \
         ripgrep \
         rsync \
         stow \
         tailscale \
-        tmux \
         tree \
         unzip \
+        zellij \
         zip \
         zoxide \
         zsh
@@ -47,7 +47,6 @@ function main {
         maven \
         nodejs \
         npm \
-        pgcli \
         python \
         python-pip \
         python-pipx
@@ -58,32 +57,15 @@ function main {
     makepkg -si
     cd $HOME
 
-    # Claude Code
-    curl -fsSL https://claude.ai/install.sh | bash
-
-    # NVM and NodeJS LTS
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-    . $HOME/.bashrc && . $HOME/.profile
-    nvm install --lts && nvm use --lts
-
     # SDKMAN and Spring CLI
     curl -s "https://get.sdkman.io" | bash
     source $HOME/.sdkman/bin/sdkman-init.sh
     sdk install springboot
 
-    # TMUX Theme and TPM
-    mkdir -p ~/.config/tmux/plugins/catppuccin
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-    git clone -b v2.1.3 https://github.com/catppuccin/tmux.git ~/.config/tmux/plugins/catppuccin/tmux
-
     # NPM Packages
     npm install -g \
         @angular/cli \
         @angular/language-server \
-        @google/gemini-cli \
         nodemon \
         prettier-plugin-tailwindcss \
         typescript \
@@ -104,9 +86,9 @@ function main {
             ttf-font-awesome \
             $(pacman -Sgq nerd-fonts)
 
-        yay -S google-chrome notion-app-electron
+        yay -S google-chrome
 
-        ln -s $WALLPAPER ~/.config/kitty/wallpaper.jpg
+        cp $WALLPAPER ~/.config/kitty/wallpaper.jpg
         git clone https://github.com/supermariofps/hatsune-miku-windows-linux-cursors $HOME/Downloads/hm-cursors
         sudo cp -r $HOME/Downloads/hm-cursors/miku-cursor-linux /usr/share/icons/miku-cursor-linux
 
@@ -163,9 +145,6 @@ function main {
         git config --global user.name "$git_name" && git config --global user.email "$git_email"
         gh auth login
         ;;
-    [nN])
-        echo "Exiting git setup..."
-        ;;
     *)
         echo "Exiting git setup..."
         ;;
@@ -182,11 +161,7 @@ function main {
     echo -e "\e[1;4;37mNext Steps\e[0m:"
     echo -e "* Run \e[1;33m[sudo tailscale up]\e[0m and follow the link to set up \e[1;33mTailscale VPN\e[0m"
     echo -e "* Run \e[1;35m[chsh]\e[0m and change user shell to \e[1;35m/usr/bin/zsh\e[0m"
-    echo -e "* Run \e[1;32m[tmux]\e[0m and press \e[1;32m[<ctrl>+b, i]\e[0m to install tmux plugins"
     echo -e "\n\e[1;4;94mIF USING SDDM GREETER\e[0m"
-    echo -e "* Using \e[1;94msudo\e[0m, edit the \e[1;94m/usr/share/sddm/themes/silent/metadata.desktop\e[0m file and \nchange the un-commented file to the desired config file."
-    echo -e "* Using \e[1;94msudo\e[0m, edit the \e[1;94m/etc/sddm.conf\e[0m file and ensure \e[1m\n\`\`\`\n\t[Theme]\n\tCurrent=silent\n\`\`\`\n\e[0m is present."
-    echo -e "* Make sure to run \e[1;94m/usr/share/sddm/themes/silent/test.sh\e[0m to ensure the \ntheme works correctly."
 }
 
 main
