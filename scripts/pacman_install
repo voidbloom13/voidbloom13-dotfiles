@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 FACE="$HOME/voidbloom13-dotfiles/assets/profile.jpg"
-WALLPAPER="$HOME/voidbloom13-dotfiles/assets/arch-wallpaper.jpg"
+WALLPAPER="$HOME/voidbloom13-dotfiles/assets/wallpaper.jpg"
 
 function main {
     cd $HOME
@@ -12,6 +12,8 @@ function main {
         bat \
         cifs-utils \
         curl \
+        docker \
+        docker-compose \
         eza \
         fastfetch \
         flatpak \
@@ -33,15 +35,8 @@ function main {
         zoxide \
         zsh
 
-    # Docker
-    sudo pacman -Syu \
-        docker \
-        docker-compose
-
     # Languages
     sudo pacman -Syu \
-        aspnet-runtime \
-        dotnet-runtime \
         dotnet-sdk \
         jdk-openjdk \
         maven \

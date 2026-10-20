@@ -1,9 +1,11 @@
-# Sources .profile
-. ~/.profile
-
 # General settings
 export EDITOR=vim
 export HISTCONTROL=ignoredups
+
+. ~/.profile
+if [[ -f ~/.aliases ]]; then
+    . ~/.aliases
+fi
 
 # Default PS1 Prompt
 PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)';
@@ -25,7 +27,3 @@ export SDKMAN_DIR="$HOME/.sdkman"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-
-# Added by Antigravity CLI installer
-export PATH="/home/xvoid/.local/bin:$PATH"
